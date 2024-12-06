@@ -699,34 +699,16 @@ const AirlineDashboard = () => {
         palette: ['#41b6c4', '#225ea8'],
       },
     },
+    style: {
+      shape:'smooth',
+      lineWidth: 2,
+    },
     height: 400,
     padding: 'auto',
     axis: {
       y: { title: '¢ per ASM' },
     },
-    legend: {
-      position: 'top-right',
-      visible: true,
-      itemName: {
-        style: {
-          fontSize: 14,
-          fontWeight: 'bold',
-        },
-      },
-    },
-    line: {
-      style: {
-        lineWidth: 2,
-        strokeWidth: 1,
-      },
-    },
-    smooth: true,
-    animation: {
-      appear: {
-        animation: 'path-in',
-        duration: 800,
-      },
-    },
+    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
   };
 
   const yieldChartConfig = {
