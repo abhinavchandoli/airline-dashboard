@@ -1,0 +1,22 @@
+.custom-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Adds shadow */
+    border-radius: 8px;                         /* Rounds the corners */
+    transition: transform 0.3s ease;            /* Smooth transition */
+  }
+
+  /* In your AirlineDashboard.css */
+
+.current-airline {
+  background-color: #fff; /* Light blue background */
+  border: 2px solid #1890ff; /* Blue border */
+}
+
+.other-airline {
+  background-color: #fff; /* White background */
+}
+
+.desktop-container {
+  width: 1280px; /* Fixed width to simulate desktop mode */
+  margin: 0 auto; /* Center the container */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
