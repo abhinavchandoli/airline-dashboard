@@ -122,7 +122,7 @@ const HomePage = () => {
           This project addresses the need for accessible and comprehensive financial analysis of
           major U.S. airlines. Developed as a capstone project for the{' '}
           <a href="https://catsr.vse.gmu.edu/" target="_blank" rel="noopener noreferrer">
-            Center for Air Transportation Systems Research
+            Center for Air Transportation Systems Research (CATSR)
           </a>{' '}
           at George Mason University, which was chartered in 2003, the dashboard provides valuable
           insights into airline performance metrics. It empowers users to explore data trends and
