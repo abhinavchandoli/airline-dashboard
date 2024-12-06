@@ -673,18 +673,18 @@ const AirlineDashboard = () => {
     data: aggregateLoadFactorByYear(airlineData, chartSelectedRegion),
     xField: 'YEAR',
     yField: 'value',
-    autoFit: true,
-    scale: {
-      y: { nice: true },
-      color: '#225ea8',
-    },
-    shapeField: 'smooth',
     height: 400,
-    padding: 'auto',
-    axis: {
-      y: { title: '%' },
+    style: {
+      stroke: '#2892d7',
+      shape:'smooth',
+      lineWidth: 2,
     },
-    smooth: true,
+    axis: {
+      y: {
+        title: '(%)',
+      },
+    },
+    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
   };
 
   const casmRasmChartConfig = {
@@ -733,53 +733,18 @@ const AirlineDashboard = () => {
     data: aggregateYieldByYear(airlineData, chartSelectedRegion),
     xField: 'YEAR',
     yField: 'value',
-    autoFit: true,
-    height: 300,
-    padding: 'auto',
-    shapeField: 'smooth',
-    scale: { color: { palette: 'Paired' } },
+    height: 400,
+    style: {
+      stroke: '#2892d7',
+      shape:'smooth',
+      lineWidth: 2,
+    },
     axis: {
-      y: { title: '¢ per Million Miles' },
-    },
-    xAxis: {
-      title: {
-        text: 'Year',
-        style: {
-          fontSize: 14,
-          fontWeight: 'bold',
-        },
-      },
-      label: {
-        autoHide: false,
-        autoRotate: false,
-        rotate: -45,
+      y: {
+        title: '¢ per mile',
       },
     },
-    yAxis: {
-      title: {
-        text: 'Yield (cents per mile)',
-        style: {
-          fontSize: 14,
-          fontWeight: 'bold',
-        },
-      },
-      label: {
-        formatter: (value) => `${value.toFixed(4)}¢`,
-      },
-    },
-    smooth: true,
-    lineStyle: {
-      lineWidth: 3,
-    },
-    point: {
-      size: 4,
-      shape: 'circle',
-      style: {
-        stroke: '#fff',
-        lineWidth: 1,
-      },
-    },
-    color: '#52c41a',
+    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
   };
 
   const getStackedColumnChartConfig = (metric) => {
