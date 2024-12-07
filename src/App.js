@@ -4,7 +4,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import HomePage from './components/Homepage';
-import AirlineDashboard from './components/AirlineDashboard';
+import AirlineDashboard from './components/AirlineDashboard/AirlineDashboard';
 import DataPage from './components/DataPage';
 import ResourcesPage from './components/ResourcesPage';
 import AboutPage from './components/AboutPage';
