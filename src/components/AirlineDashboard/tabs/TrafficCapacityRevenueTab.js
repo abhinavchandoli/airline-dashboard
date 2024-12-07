@@ -34,7 +34,6 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     yField: 'value',
     seriesField: 'QUARTER',
     colorField: 'QUARTER',
-    seriesField: 'QUARTER',
     stack: {
       groupBy: ['x', 'series'],
       series: false,

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Statistic, Row, Col, Progress } from 'antd';
-import useKPIs from '../../../hooks/useKPIs';
 import { formatNumber } from '../../../utils/formatNumber';
 
 const KPICards = ({ kpis }) => {
@@ -24,7 +23,7 @@ const KPICards = ({ kpis }) => {
             </Card>
           </Col>
           <Col xs={24} sm={12} md={8} lg={6}>
-            <Card className="custom-card">
+            <Card className="custom-card" size="small">
               <Statistic title="Average Load Factor" value={`${kpis.loadFactor}%`} />
               <Progress
                 percent={parseFloat(kpis.loadFactor)}

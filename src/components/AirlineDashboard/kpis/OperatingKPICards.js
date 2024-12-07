@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Statistic, Row, Col } from 'antd';
-import useOperatingKPIs from '../../../hooks/useOperatingKPIs';
 import { formatNumber } from '../../../utils/formatNumber';
 
 const OperatingKPICards = ({ operatingKPIs }) => {

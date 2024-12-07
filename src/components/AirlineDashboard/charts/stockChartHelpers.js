@@ -1,5 +1,3 @@
-import { formatNumber } from '../../../utils/formatNumber';
-
 export const formatReturn = (value) => {
   if (value === 'N/A' || value === null || value === undefined) {
     return 'N/A';

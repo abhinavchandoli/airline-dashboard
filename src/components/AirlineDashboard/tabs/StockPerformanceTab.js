@@ -31,7 +31,6 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
       style: {
         fill: 'linear-gradient(-90deg, #41b6c4 0%, #225ea8 100%)',
       },
-      smooth: true,
       height: 400,
   };
 
