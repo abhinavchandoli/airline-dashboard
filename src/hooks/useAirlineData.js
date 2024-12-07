@@ -12,36 +12,37 @@ const useAirlineData = (airlineId) => {
   const [stockData, setStockData] = useState([]);
   const [allStockKPIs, setAllStockKPIs] = useState([]);
   const [stockKPIs, setStockKPIs] = useState({});
+  const [balanceSheets, setBalanceSheets] = useState([]);
 
   const calculateStockKPIs = () => {
     if (!stockData || stockData.length === 0) return;
-  
+
     // Sort stockData by Date and ensure dates are properly parsed
     const sortedData = [...stockData].map(item => ({
       ...item,
       Date: new Date(item.Date)
     })).sort((a, b) => a.Date - b.Date);
-    
+
     // Get latest data point
     const latestDataPoint = sortedData[sortedData.length - 1];
     const latestPrice = parseFloat(latestDataPoint['Adj Close']);
     const latestDate = latestDataPoint.Date;
-    
+
     // Create start of year date
     const startOfYear = new Date(latestDate.getFullYear(), 0, 1);
-    
+
     // Find YTD starting point - look for exact date first, then closest before
     let ytdDataPoint = sortedData.find(d => 
       d.Date.getFullYear() === startOfYear.getFullYear() &&
       d.Date.getMonth() === startOfYear.getMonth() &&
       d.Date.getDate() === startOfYear.getDate()
     );
-  
+
     // If no exact match, find the first data point after January 1st
     if (!ytdDataPoint) {
       ytdDataPoint = sortedData.find(d => d.Date >= startOfYear);
     }
-  
+
     // Calculate YTD return
     let ytdReturn;
     if (ytdDataPoint && ytdDataPoint['Adj Close']) {
@@ -50,7 +51,7 @@ const useAirlineData = (airlineId) => {
     } else {
       ytdReturn = 'N/A';
     }
-  
+
     // 1-Year Return calculation
     const oneYearAgoDate = new Date(latestDate);
     oneYearAgoDate.setFullYear(oneYearAgoDate.getFullYear() - 1);
@@ -63,7 +64,7 @@ const useAirlineData = (airlineId) => {
     } else {
       oneYearReturn = 'N/A';
     }
-  
+
     // 3-Year Return calculation
     const threeYearsAgoDate = new Date(latestDate);
     threeYearsAgoDate.setFullYear(threeYearsAgoDate.getFullYear() - 3);
@@ -76,7 +77,7 @@ const useAirlineData = (airlineId) => {
     } else {
       threeYearReturn = 'N/A';
     }
-  
+
     // 5-Year Return calculation
     const fiveYearsAgoDate = new Date(latestDate);
     fiveYearsAgoDate.setFullYear(fiveYearsAgoDate.getFullYear() - 5);
@@ -89,7 +90,7 @@ const useAirlineData = (airlineId) => {
     } else {
       fiveYearReturn = 'N/A';
     }
-  
+
     // Set the KPIs
     setStockKPIs({
       latestPrice,
@@ -111,12 +112,14 @@ const useAirlineData = (airlineId) => {
           allStockKPIsResponse,
           operatingDataResponse,
           operatingDataExtendedResponse,
+          balanceSheetsResponse,
         ] = await Promise.all([
           axios.get(`http://localhost:3001/api/airline-data/${airlineId}`),
           axios.get(`http://localhost:3001/api/stock-data/${airlineId}`),
           axios.get('http://localhost:3001/api/stock-kpis'),
           axios.get(`http://localhost:3001/api/operating-data/${airlineId}`),
           axios.get(`http://localhost:3001/api/operatingdataextended/${airlineId}`),
+          axios.get(`http://localhost:3001/api/balance-sheets/${airlineId}`)
         ]);
 
         // Process and set airlineData
@@ -124,10 +127,6 @@ const useAirlineData = (airlineId) => {
 
         // Process and set stockData
         setStockData(stockDataResponse.data);
-
-
-
-
 
         // Process allStockKPIs
         const data = allStockKPIsResponse.data;
@@ -157,6 +156,10 @@ const useAirlineData = (airlineId) => {
 
         // Set operatingDataExtended
         setOperatingDataExtended(operatingDataExtendedResponse.data);
+
+        // Set balanceSheets
+        setBalanceSheets(balanceSheetsResponse.data);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -181,6 +184,7 @@ const useAirlineData = (airlineId) => {
     stockData,
     allStockKPIs,
     stockKPIs,
+    balanceSheets,
   };
 };
 

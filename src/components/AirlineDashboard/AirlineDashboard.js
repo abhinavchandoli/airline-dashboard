@@ -1,15 +1,15 @@
-/* eslint-env es2020 */
-import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+// AirlineDashboard.jsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Spin, Tabs } from 'antd';
-
-import airlines from '../../data/airlines';
+import { Tabs, Spin } from 'antd';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import useAirlineData from '../../hooks/useAirlineData';
+import airlines from '../../data/airlines';
 
 import TrafficCapacityRevenueTab from './tabs/TrafficCapacityRevenueTab';
 import StockPerformanceTab from './tabs/StockPerformanceTab';
 import OperatingStatisticsTab from './tabs/OperatingStatisticsTab';
+import FinancialBalanceSheetTab from './tabs/FinancialBalanceSheetTab'; // import the new tab
 import EnlargedChartModal from './EnlargedChartModal';
 
 const AirlineDashboard = () => {
@@ -20,8 +20,16 @@ const AirlineDashboard = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get('tab');
 
-  const { loading, airlineData, operatingData, operatingDataExtended, stockData, allStockKPIs, stockKPIs } =
-    useAirlineData(airlineId);
+  const {
+    loading,
+    airlineData,
+    operatingData,
+    operatingDataExtended,
+    stockData,
+    allStockKPIs,
+    stockKPIs,
+    balanceSheets,
+  } = useAirlineData(airlineId);
 
   const [activeTabKey, setActiveTabKey] = useState(initialTab === 'stock' ? '2' : '1');
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -58,36 +66,22 @@ const AirlineDashboard = () => {
     {
       key: '1',
       label: 'Traffic, Capacity, and Revenue by Region',
-      children: (
-        <TrafficCapacityRevenueTab
-          airlineData={airlineData}
-          handleEnlargeClick={handleEnlargeClick}
-        />
-      ),
+      children: <TrafficCapacityRevenueTab airlineData={airlineData} handleEnlargeClick={handleEnlargeClick} />,
     },
     {
       key: '2',
       label: 'Stock Performance',
-      children: (
-        <StockPerformanceTab
-          airlineId={airlineId}
-          airlineInfo={airlineInfo}
-          stockData={stockData}
-          allStockKPIs={allStockKPIs}
-          stockKPIs={stockKPIs}
-          navigate={navigate}
-        />
-      ),
+      children: <StockPerformanceTab airlineId={airlineId} airlineInfo={airlineInfo} stockData={stockData} allStockKPIs={allStockKPIs} stockKPIs={stockKPIs} navigate={navigate} />,
     },
     {
       key: '3',
       label: 'Operating Statistics/Expenses',
-      children: (
-        <OperatingStatisticsTab
-          operatingData={operatingData}
-          operatingDataExtended={operatingDataExtended}
-        />
-      ),
+      children: <OperatingStatisticsTab operatingData={operatingData} operatingDataExtended={operatingDataExtended} />,
+    },
+    {
+      key: '4',
+      label: 'Financial & Balance Sheet',
+      children: <FinancialBalanceSheetTab airlineData={airlineData} balanceSheets={balanceSheets} />,
     },
   ];
 
