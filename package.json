@@ -1,5 +1,6 @@
 {
   "name": "airline-dashboard-frontend",
+  "homepage": "https://airline-dashboard.netlify.app/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
