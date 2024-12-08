@@ -177,7 +177,7 @@ const DataPage = () => {
     setLoadingCollection(collectionName);
     try {
       // Define the backend API URL
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://dashboard-backend-production-4c8c.up.railway.app';
 
       const response = await axios.get(`${backendUrl}/api/download/${collectionName}`, {
         responseType: 'blob', // Important for handling binary data

@@ -15,7 +15,7 @@ const useAirlineData = (airlineId) => {
   const [balanceSheets, setBalanceSheets] = useState([]);
   const [error, setError] = useState(null); // New error state
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
   // Add a console log to verify API_BASE_URL
   console.log('API_BASE_URL:', API_BASE_URL);
