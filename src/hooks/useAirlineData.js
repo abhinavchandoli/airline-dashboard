@@ -14,6 +14,8 @@ const useAirlineData = (airlineId) => {
   const [stockKPIs, setStockKPIs] = useState({});
   const [balanceSheets, setBalanceSheets] = useState([]);
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const calculateStockKPIs = useCallback(() => {
     if (!stockData || stockData.length === 0) return;
 
@@ -114,12 +116,12 @@ const useAirlineData = (airlineId) => {
           operatingDataExtendedResponse,
           balanceSheetsResponse,
         ] = await Promise.all([
-          axios.get(`http://localhost:3001/api/airline-data/${airlineId}`),
-          axios.get(`http://localhost:3001/api/stock-data/${airlineId}`),
-          axios.get('http://localhost:3001/api/stock-kpis'),
-          axios.get(`http://localhost:3001/api/operating-data/${airlineId}`),
-          axios.get(`http://localhost:3001/api/operatingdataextended/${airlineId}`),
-          axios.get(`http://localhost:3001/api/balance-sheets/${airlineId}`)
+          axios.get(`${API_BASE_URL}/airline-data/${airlineId}`),
+          axios.get(`${API_BASE_URL}/stock-data/${airlineId}`),
+          axios.get(`${API_BASE_URL}/stock-kpis`),
+          axios.get(`${API_BASE_URL}/operating-data/${airlineId}`),
+          axios.get(`${API_BASE_URL}/operatingdataextended/${airlineId}`),
+          axios.get(`${API_BASE_URL}/balance-sheets/${airlineId}`)
         ]);
 
         // Process and set airlineData
@@ -168,7 +170,7 @@ const useAirlineData = (airlineId) => {
     };
 
     fetchData();
-  }, [airlineId]);
+  }, [airlineId, API_BASE_URL]);
 
   useEffect(() => {
     if (stockData && stockData.length > 0) {
