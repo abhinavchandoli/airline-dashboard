@@ -17,6 +17,13 @@ export default defineConfig(({ mode }) => {
             htmlPlugin(mode),
             svgrPlugin(),
         ],
+        build: {
+            outDir: 'dist',
+            sourcemap: true
+          },
+          server: {
+            historyApiFallback: true
+          }
     };
 });
 function setEnv(mode) {
