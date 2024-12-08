@@ -1,13 +1,8 @@
 {
     "rewrites": [
-      { "source": "/airline/:path*", "destination": "/" },
-      { "source": "/data", "destination": "/" },
-      { "source": "/resources", "destination": "/" },
-      { "source": "/about", "destination": "/" },
       {
-        "source": "/:path*",
-        "destination": "/"
+        "source": "/(.*)",
+        "destination": "/index.html"
       }
     ]
   }
-  
