@@ -1,12 +1,17 @@
+// src/components/AirlineDashboard/filters/RegionYearFilters.jsx
 import React from 'react';
 import { Row, Col, Select } from 'antd';
+import { regionMap } from '../../../utils/dataTransformations';
 const { Option } = Select;
 
 const RegionYearFilters = ({ chartSelectedRegion, setChartSelectedRegion, airlineData }) => {
   const getAvailableRegions = () => {
     if (!airlineData || airlineData.length === 0) return [];
     const regionSet = new Set(airlineData.map((item) => item.REGION));
-    return Array.from(regionSet);
+    // Map codes to full names
+    return Array.from(regionSet)
+      .map((code) => regionMap[code])
+      .filter((name) => !!name);
   };
 
   return (

@@ -12,6 +12,7 @@ import OperatingStatisticsTab from './tabs/OperatingStatisticsTab';
 import FinancialBalanceSheetTab from './tabs/FinancialBalanceSheetTab'; // import the new tab
 import EnlargedChartModal from './EnlargedChartModal';
 
+
 const AirlineDashboard = () => {
   const { airlineId } = useParams();
   const navigate = useNavigate();

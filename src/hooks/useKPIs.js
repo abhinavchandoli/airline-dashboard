@@ -1,9 +1,9 @@
-// useKPIs.js
+// src/hooks/useKPIs.js
 import { useMemo } from 'react';
 import Big from 'big.js';
-import { filterDataByRegionAndYear } from '../utils/dataTransformations';
+import { filterDataByRegionAndYear, regionMap, regionMapReverse } from '../utils/dataTransformations';
 
-export default function useKPIs(airlineData, kpiSelectedRegion, kpiSelectedYear, regionMap, regionMapReverse) {
+export default function useKPIs(airlineData, kpiSelectedRegion, kpiSelectedYear) {
   return useMemo(() => {
     if (!airlineData || airlineData.length === 0) {
       return {
@@ -45,14 +45,14 @@ export default function useKPIs(airlineData, kpiSelectedRegion, kpiSelectedYear,
     const avgLoadFactor = totalASM.eq(0) ? 0 : totalRPM.div(totalASM).times(100).toNumber();
 
     return {
-      departures: totalDepartures,
-      distance: totalDistance,
-      passengers: totalPassengers,
+      departures: totalDepartures.toNumber(),
+      distance: totalDistance.toNumber(),
+      passengers: totalPassengers.toNumber(),
       loadFactor: Number(avgLoadFactor.toFixed(2)),
-      transRevPax: totalTransRevPax,
-      opExpenses: totalOpExpenses,
-      opRevenue: totalRevenue,
-      airTime: totalAirTime,
+      transRevPax: totalTransRevPax.toNumber(),
+      opExpenses: totalOpExpenses.toNumber(),
+      opRevenue: totalRevenue.toNumber(),
+      airTime: totalAirTime.toNumber(),
     };
-  }, [airlineData, kpiSelectedRegion, kpiSelectedYear, regionMap, regionMapReverse]);
+  }, [airlineData, kpiSelectedRegion, kpiSelectedYear]);
 }

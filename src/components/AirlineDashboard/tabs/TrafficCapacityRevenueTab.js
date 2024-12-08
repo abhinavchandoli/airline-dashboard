@@ -1,3 +1,4 @@
+// src/components/AirlineDashboard/tabs/TrafficCapacityRevenueTab.jsx
 import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Table } from 'antd';
 import { GridContent } from '@ant-design/pro-layout';
@@ -14,10 +15,11 @@ import {
   aggregateCASMvsRASMByYear,
   aggregateYieldByYear,
   filterDataByRegionAndYear,
+  regionMap,
+  regionMapReverse,
 } from '../../../utils/dataTransformations';
 import { formatNumber } from '../../../utils/formatNumber';
 import '../../AirlineDashboard.css';
-
 
 import { InfoCircleOutlined, FullscreenOutlined } from '@ant-design/icons';
 
@@ -29,7 +31,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
   const kpis = useKPIs(airlineData, kpiSelectedRegion, kpiSelectedYear);
 
   const getStackedColumnChartConfig = (metric) => ({
-    data: aggregateDataByYearAndQuarter(airlineData, metric, chartSelectedRegion).sort((a, b) => b.YEAR - a.YEAR),
+    data: aggregateDataByYearAndQuarter(airlineData, metric, chartSelectedRegion, regionMap, regionMapReverse).sort((a, b) => b.YEAR - a.YEAR),
     xField: 'YEAR',
     yField: 'value',
     seriesField: 'QUARTER',
@@ -60,14 +62,15 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       radiusBottomRight: 8,
     },
     tooltip: {
-      items: [{ channel: 'y', valueFormatter: formatNumber }] },
+      items: [{ channel: 'y', valueFormatter: formatNumber }],
+    },
   });
 
   const transRevPaxChartConfig = useMemo(() => getStackedColumnChartConfig('TRANS_REV_PAX'), [chartSelectedRegion, airlineData]);
   const OpRevenueChartConfig = useMemo(() => getStackedColumnChartConfig('OP_REVENUES'), [chartSelectedRegion, airlineData]);
   const opExpensesChartConfig = useMemo(() => getStackedColumnChartConfig('OP_EXPENSES'), [chartSelectedRegion, airlineData]);
 
-  const loadFactorData = useMemo(() => aggregateLoadFactorByYear(airlineData, chartSelectedRegion), [chartSelectedRegion, airlineData]);
+  const loadFactorData = useMemo(() => aggregateLoadFactorByYear(airlineData, chartSelectedRegion, regionMap, regionMapReverse), [chartSelectedRegion, airlineData]);
   const loadFactorChartConfig = {
     data: loadFactorData,
     xField: 'YEAR',
@@ -75,7 +78,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     height: 400,
     style: {
       stroke: '#2892d7',
-      shape:'smooth',
+      shape: 'smooth',
       lineWidth: 2,
     },
     axis: {
@@ -83,10 +86,10 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
         title: '(%)',
       },
     },
-    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
+    tooltip: { items: [{ channel: 'y', valueFormatter: '.2f' }] },
   };
 
-  const casmRasmData = useMemo(() => aggregateCASMvsRASMByYear(airlineData, chartSelectedRegion), [chartSelectedRegion, airlineData]);
+  const casmRasmData = useMemo(() => aggregateCASMvsRASMByYear(airlineData, chartSelectedRegion, regionMap, regionMapReverse), [chartSelectedRegion, airlineData]);
   const casmRasmChartConfig = {
     data: casmRasmData,
     xField: 'YEAR',
@@ -99,7 +102,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       },
     },
     style: {
-      shape:'smooth',
+      shape: 'smooth',
       lineWidth: 2,
     },
     height: 400,
@@ -107,30 +110,30 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     axis: {
       y: { title: '¢ per ASM' },
     },
-    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
+    tooltip: { items: [{ channel: 'y', valueFormatter: '.2f' }] },
   };
 
-  const yieldData = useMemo(() => aggregateYieldByYear(airlineData, chartSelectedRegion), [chartSelectedRegion, airlineData]);
+  const yieldData = useMemo(() => aggregateYieldByYear(airlineData, chartSelectedRegion, regionMap, regionMapReverse), [chartSelectedRegion, airlineData]);
   const yieldChartConfig = {
     data: yieldData,
     xField: 'YEAR',
     yField: 'value',
     height: 400,
     style: {
-        stroke: '#2892d7',
-        shape:'smooth',
-        lineWidth: 2,
+      stroke: '#2892d7',
+      shape: 'smooth',
+      lineWidth: 2,
+    },
+    axis: {
+      y: {
+        title: '¢ per mile',
       },
-      axis: {
-        y: {
-          title: '¢ per mile',
-        },
-      },
-      tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
+    },
+    tooltip: { items: [{ channel: 'y', valueFormatter: '.2f' }] },
   };
 
-  const asmData = useMemo(() => aggregateDataByYearAndQuarter(airlineData, 'ASM', chartSelectedRegion), [chartSelectedRegion, airlineData]);
-  const rpmData = useMemo(() => aggregateDataByYearAndQuarter(airlineData, 'RPM', chartSelectedRegion), [chartSelectedRegion, airlineData]);
+  const asmData = useMemo(() => aggregateDataByYearAndQuarter(airlineData, 'ASM', chartSelectedRegion, regionMap, regionMapReverse), [chartSelectedRegion, airlineData]);
+  const rpmData = useMemo(() => aggregateDataByYearAndQuarter(airlineData, 'RPM', chartSelectedRegion, regionMap, regionMapReverse), [chartSelectedRegion, airlineData]);
 
   const asmChartConfig = {
     data: asmData.sort((a, b) => b.YEAR - a.YEAR),
@@ -207,7 +210,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
   };
 
   const getLast5YearsData = (metric) => {
-    const data = aggregateByYear(filterDataByRegionAndYear(airlineData, chartSelectedRegion, 'All'), metric);
+    const data = aggregateByYear(filterDataByRegionAndYear(airlineData, chartSelectedRegion, 'All', regionMap, regionMapReverse), metric);
     return data
       .sort((a, b) => b.YEAR - a.YEAR)
       .slice(0, 5)

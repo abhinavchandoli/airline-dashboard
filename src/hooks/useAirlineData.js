@@ -1,6 +1,6 @@
 // src/hooks/useAirlineData.js
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import airlines from '../data/airlines';
 
@@ -14,7 +14,7 @@ const useAirlineData = (airlineId) => {
   const [stockKPIs, setStockKPIs] = useState({});
   const [balanceSheets, setBalanceSheets] = useState([]);
 
-  const calculateStockKPIs = () => {
+  const calculateStockKPIs = useCallback(() => {
     if (!stockData || stockData.length === 0) return;
 
     // Sort stockData by Date and ensure dates are properly parsed
@@ -100,7 +100,7 @@ const useAirlineData = (airlineId) => {
       threeYearReturn,
       fiveYearReturn,
     });
-  };
+  }, [stockData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -174,7 +174,7 @@ const useAirlineData = (airlineId) => {
     if (stockData && stockData.length > 0) {
       calculateStockKPIs();
     }
-  }, [stockData]);
+  }, [stockData, calculateStockKPIs]);
 
   return {
     loading,

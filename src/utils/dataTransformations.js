@@ -1,9 +1,8 @@
-// dataTransformations.js
+// src/utils/dataTransformations.js
 import Big from 'big.js';
 
 /**
  * Maps short region codes to full region names.
- * Example: 'A' -> 'Atlantic'
  */
 export const regionMap = {
   A: 'Atlantic',
@@ -15,7 +14,6 @@ export const regionMap = {
 
 /**
  * Reverse mapping of region names to their codes.
- * Example: 'Atlantic' -> 'A'
  */
 export const regionMapReverse = {
   Atlantic: 'A',
@@ -27,28 +25,24 @@ export const regionMapReverse = {
 
 /**
  * Filters data by region and year.
- * 
- * @param {Array} data - The array of data objects.
- * @param {string} region - The selected region (e.g. 'All', 'Domestic', etc.).
- * @param {string} year - The selected year or 'All'.
- * @param {Object} regionMap - The mapping of region codes to region names.
- * @param {Object} regionMapReverse - The reverse mapping of region names to codes.
- * @returns {Array} - The filtered data.
+ * region can be 'All' or full region name (e.g. 'Domestic').
+ * If region is a full region name, we convert it using regionMapReverse.
+ * If region is 'All', we accept all regions.
  */
 export function filterDataByRegionAndYear(data, region, year, regionMap, regionMapReverse) {
   return data.filter((item) => {
-    const regionMatch = region === 'All' || regionMap[item.REGION] === region || item.REGION === regionMapReverse[region];
-    const yearMatch = year === 'All' || item.YEAR?.toString() === year;
+    const regionMatch =
+      region === 'All' ||
+      regionMap[item.REGION] === region ||
+      (regionMapReverse[region] && item.REGION === regionMapReverse[region]);
+
+    const yearMatch = year === 'All' || (item.YEAR && item.YEAR.toString() === year);
     return regionMatch && yearMatch;
   });
 }
 
 /**
- * Aggregates data by year for a given metric, summing all values for that year.
- * 
- * @param {Array} data - The array of data objects.
- * @param {string} metric - The metric (property name) to aggregate.
- * @returns {Array} - An array of objects { YEAR: string, value: number } sorted by year.
+ * Aggregates data by year for a given metric.
  */
 export function aggregateByYear(data, metric) {
   const aggregated = {};
@@ -68,13 +62,6 @@ export function aggregateByYear(data, metric) {
 
 /**
  * Aggregates data by year and quarter for a given metric.
- * Useful for stacked column charts by quarter.
- * 
- * @param {Array} data - The array of data objects.
- * @param {string} metric - The metric (property name) to aggregate.
- * @param {string} region - The selected region.
- * @param {Function} filterFunc - A filtering function if needed.
- * @returns {Array} - An array of objects { YEAR: string, QUARTER: string, value: number }.
  */
 export function aggregateDataByYearAndQuarter(data, metric, region, regionMap, regionMapReverse) {
   const filteredData = filterDataByRegionAndYear(data, region, 'All', regionMap, regionMapReverse);
@@ -95,7 +82,7 @@ export function aggregateDataByYearAndQuarter(data, metric, region, regionMap, r
     aggregated[key].value = aggregated[key].value.plus(value);
   });
 
-  const result = Object.values(aggregated)
+  return Object.values(aggregated)
     .map((item) => ({
       YEAR: item.YEAR,
       QUARTER: item.QUARTER,
@@ -108,18 +95,12 @@ export function aggregateDataByYearAndQuarter(data, metric, region, regionMap, r
         return a.QUARTER.localeCompare(b.QUARTER);
       }
     });
-
-  return result;
 }
 
 /**
- * Aggregates load factor by year. Load factor is RPM/ASM * 100.
- * 
- * @param {Array} data - The airline data.
- * @param {string} region - The selected region.
- * @returns {Array} - An array of { YEAR: string, value: number } representing load factor per year.
+ * Aggregates load factor by year. Load factor = RPM/ASM * 100.
  */
-export function aggregateLoadFactorByYear(data, region) {
+export function aggregateLoadFactorByYear(data, region, regionMap, regionMapReverse) {
   const filteredData = filterDataByRegionAndYear(data, region, 'All', regionMap, regionMapReverse);
 
   const aggregated = {};
@@ -152,17 +133,9 @@ export function aggregateLoadFactorByYear(data, region) {
 
 /**
  * Aggregates CASM vs RASM by year.
- * CASM and RASM may need scaling depending on source data.
- * 
- * @param {Array} data - The airline data.
- * @param {string} region - The selected region.
- * @returns {Array} - An array of objects { YEAR: string, value: number, type: 'CASM'|'RASM' }
  */
-export function aggregateCASMvsRASMByYear(data, region) {
-  const filteredData = data.filter((item) => {
-    const regionMatch = region === 'All' || regionMap[item.REGION] === region;
-    return regionMatch;
-  });
+export function aggregateCASMvsRASMByYear(data, region, regionMap, regionMapReverse) {
+  const filteredData = filterDataByRegionAndYear(data, region, 'All', regionMap, regionMapReverse);
 
   const aggregated = {};
   filteredData.forEach((item) => {
@@ -191,18 +164,10 @@ export function aggregateCASMvsRASMByYear(data, region) {
 }
 
 /**
- * Aggregates Yield by year.
- * Yield may need to be scaled depending on the original unit.
- * 
- * @param {Array} data - The airline data.
- * @param {string} region - The selected region.
- * @returns {Array} - { YEAR: string, value: number } representing average yield scaled to cents per mile.
+ * Aggregates Yield by year and converts it to cents per mile.
  */
-export function aggregateYieldByYear(data, region) {
-  const filteredData = data.filter((item) => {
-    const regionMatch = region === 'All' || item.REGION === regionMapReverse[region];
-    return regionMatch;
-  });
+export function aggregateYieldByYear(data, region, regionMap, regionMapReverse) {
+  const filteredData = filterDataByRegionAndYear(data, region, 'All', regionMap, regionMapReverse);
 
   const aggregated = {};
   filteredData.forEach((item) => {
@@ -221,8 +186,6 @@ export function aggregateYieldByYear(data, region) {
     .map((year) => {
       const { totalYield, count } = aggregated[year];
       const averageYield = count ? totalYield / count : 0;
-
-      // Scale the yield to cents per mile if needed
       const scaledYield = averageYield * 1e6;
 
       return {
