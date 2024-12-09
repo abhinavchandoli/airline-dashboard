@@ -6,7 +6,7 @@ import FinancialCorrelationChart from '../charts/FinancialCorrelationChart';
 
 const { Option } = Select;
 
-const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
+const FinancialBalanceSheetTab = ({  airlineData, balanceSheets, operatingData, stockData }) => {
   const [selectedYear, setSelectedYear] = useState('All');
   const [selectedQuarter, setSelectedQuarter] = useState('All');
 
