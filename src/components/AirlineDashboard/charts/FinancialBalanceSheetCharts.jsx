@@ -1,24 +1,10 @@
 import React, { useMemo } from 'react';
 import { Line, Column, Pie } from '@ant-design/plots';
+import { Tabs } from 'antd';
+import Big from 'big.js';
 import { formatNumber } from '../../../utils/formatNumber';
 
-/**
- * Helper functions to aggregate data
- */
-
-// Filter data by selected year and quarter
-function filterDataByTime(airlineData, balanceSheets, selectedYear, selectedQuarter) {
-  const yearFilter = (d) =>
-    (selectedYear === 'All' || d.YEAR === Number(selectedYear)) &&
-    (selectedQuarter === 'All' || d.QUARTER === Number(selectedQuarter));
-
-  const filteredAirlineData = airlineData.filter(yearFilter);
-  const filteredBalanceSheets = balanceSheets.filter(yearFilter);
-
-  return { filteredAirlineData, filteredBalanceSheets };
-}
-
-// Group data by year for time-series charts (we assume multiple years)
+// Helper functions
 function groupByYear(dataArray) {
   const grouped = {};
   dataArray.forEach(d => {
@@ -29,9 +15,7 @@ function groupByYear(dataArray) {
   return grouped;
 }
 
-// Compute aggregates per year for airlineData
 function computeAirlineYearlyMetrics(airlineData) {
-  // For each year, sum up OP_REVENUES, NET_INCOME, OP_EXPENSES and compute margins
   const grouped = groupByYear(airlineData);
   const result = [];
 
@@ -55,20 +39,16 @@ function computeAirlineYearlyMetrics(airlineData) {
     });
   });
 
-  // Sort by year
   result.sort((a, b) => parseInt(a.year) - parseInt(b.year));
   return result;
 }
 
-// Compute balance sheet metrics per year
 function computeBalanceSheetMetrics(balanceSheets, airlineData) {
-  // We also need net income from airlineData for ROA and ROE
   const groupedBS = groupByYear(balanceSheets);
-  const groupedAD = computeAirlineYearlyMetrics(airlineData);
+  const yearlyAirlineMetrics = computeAirlineYearlyMetrics(airlineData);
 
-  // Map airline metrics by year for easy lookup
   const adMap = {};
-  groupedAD.forEach(d => {
+  yearlyAirlineMetrics.forEach(d => {
     adMap[d.year] = d;
   });
 
@@ -76,8 +56,7 @@ function computeBalanceSheetMetrics(balanceSheets, airlineData) {
 
   Object.keys(groupedBS).forEach(year => {
     const rows = groupedBS[year];
-    // Take the last quarter's data or average
-    // For simplicity, just take the last one of the year
+    // Take the last quarter of that year
     const bsRecord = rows[rows.length - 1];
 
     const CURR_ASSETS = bsRecord?.CURR_ASSETS || 0;
@@ -115,14 +94,10 @@ function computeBalanceSheetMetrics(balanceSheets, airlineData) {
   return result;
 }
 
-// Prepare data for composition charts (Assets, Liabilities, Equity)
 function getBalanceSheetCompositionData(balanceSheetData) {
-  // Take last available record (or specific year/quarter if filtering)
   if (!balanceSheetData || balanceSheetData.length === 0) return { assetsData: [], liabData: [], equityData: [] };
 
   const bs = balanceSheetData[balanceSheetData.length - 1]; 
-
-  // Breakdown Assets (just a few major categories for illustration)
   const assetsData = [
     { category: 'Current Assets', value: bs.CURR_ASSETS || 0 },
     { category: 'Property & Equipment Net', value: bs.PROP_EQUIP_NET || 0 },
@@ -130,7 +105,6 @@ function getBalanceSheetCompositionData(balanceSheetData) {
     { category: 'Other Assets', value: (bs.ASSETS || 0) - ((bs.CURR_ASSETS || 0) + (bs.PROP_EQUIP_NET || 0) + (bs.SPECIAL_FUNDS || 0)) }
   ];
 
-  // Breakdown Liabilities (just a few categories)
   const liabData = [
     { category: 'Current Liabilities', value: bs.CURR_LIABILITIES || 0 },
     { category: 'Long Term Debt', value: bs.LONG_TERM_DEBT || 0 },
@@ -138,7 +112,6 @@ function getBalanceSheetCompositionData(balanceSheetData) {
     { category: 'Deferred Credits', value: bs.DEF_CREDITS || 0 },
   ];
 
-  // Equity breakdown
   const equityData = [
     { category: 'Shareholder Equity', value: bs.SH_HLD_EQUIT_NET || 0 },
     { category: 'Capital Stock', value: bs.CAPITAL_STOCK || 0 },
@@ -149,100 +122,12 @@ function getBalanceSheetCompositionData(balanceSheetData) {
   return { assetsData, liabData, equityData };
 }
 
-/**
- * Chart Configurations
- */
+const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
+  const yearlyAirlineMetrics = useMemo(() => computeAirlineYearlyMetrics(airlineData), [airlineData]);
+  const bsMetrics = useMemo(() => computeBalanceSheetMetrics(balanceSheets, airlineData), [balanceSheets, airlineData]);
+  const { assetsData, liabData, equityData } = useMemo(() => getBalanceSheetCompositionData(balanceSheets), [balanceSheets]);
 
-// Simple line chart config generator for single metrics over time
-function lineChartConfig(data, xField, yField, yTitle, labelFormatter = formatNumber) {
-  return {
-    data,
-    xField,
-    yField,
-    height: 300,
-    yAxis: {
-      title: { text: yTitle },
-      label: { formatter: labelFormatter },
-    },
-    tooltip: {
-      formatter: (item) => ({ name: yTitle, value: formatNumber(item[yField]) }),
-    },
-    point: { size: 4 },
-    smooth: true,
-  };
-}
-
-// Dual line chart config for comparing two metrics
-function dualLineChartConfig(data, xField, metrics, yTitles) {
-  // metrics: [{ yField: 'operatingMargin', name: 'Operating Margin (%)' }, ...]
-  return {
-    data,
-    xField,
-    yField: metrics[0].yField,
-    height: 300,
-    seriesField: 'metric',
-    meta: {
-      value: { formatter: formatNumber }
-    },
-    legend: {
-      position: 'top-right'
-    },
-    tooltip: {
-      formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) })
-    },
-    encode: {
-      x: xField,
-      y: 'value',
-      color: 'metric'
-    },
-    geometryOptions: metrics.map(m => ({
-      geometry: 'line',
-      seriesField: 'metric',
-      smooth: true,
-      lineStyle: { lineWidth: 2 },
-    })),
-    // We'll preprocess data to a common structure
-  };
-}
-
-// Pie chart config for composition
-function pieChartConfig(data, title) {
-  return {
-    data,
-    angleField: 'value',
-    colorField: 'category',
-    radius: 0.9,
-    label: {
-      type: 'outer',
-      formatter: (item) => `${item.category}: ${formatNumber(item.value)}`,
-    },
-    tooltip: {
-      formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })
-    },
-    title: {
-      visible: true,
-      text: title,
-    },
-    interactions: [{ type: 'element-active' }],
-    height: 300,
-  };
-}
-
-/**
- * Main Component
- */
-
-const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets, selectedYear, selectedQuarter }) => {
-  // Filter data based on year and quarter selection
-  const { filteredAirlineData, filteredBalanceSheets } = useMemo(() => 
-    filterDataByTime(airlineData, balanceSheets, selectedYear, selectedQuarter)
-  , [airlineData, balanceSheets, selectedYear, selectedQuarter]);
-
-  const yearlyAirlineMetrics = useMemo(() => computeAirlineYearlyMetrics(filteredAirlineData), [filteredAirlineData]);
-  const bsMetrics = useMemo(() => computeBalanceSheetMetrics(filteredBalanceSheets, filteredAirlineData), [filteredBalanceSheets, filteredAirlineData]);
-  const { assetsData, liabData, equityData } = useMemo(() => getBalanceSheetCompositionData(filteredBalanceSheets), [filteredBalanceSheets]);
-
-  // Prepare data for dual line charts (operatingMargin vs netProfitMargin)
+  // Prepare data sets
   const marginDualData = [];
   yearlyAirlineMetrics.forEach(d => {
     if (d.operatingMargin !== null) {
@@ -273,7 +158,6 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets, selectedYear,
     }
   });
 
-  // Operating Revenues vs Expenses line chart
   const revExpData = [];
   yearlyAirlineMetrics.forEach(d => {
     revExpData.push({ year: d.year, metric: 'Operating Revenues', value: d.totalOpRevenues });
@@ -281,130 +165,172 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets, selectedYear,
   });
 
   return (
-    <div style={{ marginTop: '24px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        {/* 1. Net Income Over Time */}
-        <div>
-          <h3>Net Income Over Time</h3>
-          <Line {...lineChartConfig(yearlyAirlineMetrics, 'year', 'totalNetIncome', 'Net Income ($)')} />
+    <Tabs defaultActiveKey="1" style={{ marginTop: '24px' }}>
+      {/* Tab 1: Income and Profitability */}
+      <Tabs.TabPane key="1" tab="Income & Profitability">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          <div>
+            <h3>Net Income Over Time</h3>
+            <Line
+              data={yearlyAirlineMetrics}
+              xField="year"
+              yField="totalNetIncome"
+              height={300}
+              yAxis={{ title: { text: 'Net Income ($)' }, label: { formatter: formatNumber } }}
+              tooltip={{ formatter: (item) => ({ name: 'Net Income', value: formatNumber(item.totalNetIncome) })}}
+              smooth
+              point={{ size:4 }}
+            />
+          </div>
+          <div>
+            <h3>Operating Revenues vs Operating Expenses</h3>
+            <Column
+              data={revExpData}
+              xField="year"
+              yField="value"
+              seriesField="metric"
+              legend={{ position: 'top' }}
+              tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
+              height={300}
+              yAxis={{ title: { text: 'Amount ($)' }, label: { formatter: formatNumber } }}
+            />
+          </div>
+        </div>
+      </Tabs.TabPane>
+
+      {/* Tab 2: Margins & Ratios */}
+      <Tabs.TabPane key="2" tab="Margins & Ratios">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          <div>
+            <h3>Operating & Net Profit Margins (%)</h3>
+            <Line
+              data={marginDualData}
+              xField="year"
+              yField="value"
+              seriesField="metric"
+              yAxis={{ title: { text: 'Margin (%)' } }}
+              tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
+              height={300}
+              smooth
+              point={{ size:4 }}
+            />
+          </div>
+          <div>
+            <h3>Current Ratio & Debt-to-Equity</h3>
+            <Line
+              data={ratioDualData}
+              xField="year"
+              yField="value"
+              seriesField="metric"
+              tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
+              yAxis={{ title: { text: 'Ratio' }, label: { formatter: formatNumber } }}
+              height={300}
+              smooth
+              point={{ size:4 }}
+            />
+          </div>
         </div>
 
-        {/* 2. Operating Revenues vs Operating Expenses */}
-        <div>
-          <h3>Operating Revenues vs Operating Expenses</h3>
-          <Column
-            data={revExpData}
-            xField="year"
-            yField="value"
-            seriesField="metric"
-            legend={{ position: 'top' }}
-            tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
-            height={300}
-            yAxis={{ title: { text: 'Amount ($)' }, label: { formatter: formatNumber } }}
-          />
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        {/* 3. Operating Margin and Net Profit Margin Over Time */}
-        <div>
-          <h3>Operating & Net Profit Margins (%)</h3>
-          <Line
-            data={marginDualData}
-            xField="year"
-            yField="value"
-            seriesField="metric"
-            yAxis={{ title: { text: 'Margin (%)' } }}
-            tooltip={{ formatter: (item) => ({ name: item.metric, value: `${item.value.toFixed(2)}%` }) }}
-            height={300}
-          />
-        </div>
-
-        {/* 4. Current Ratio & Debt-to-Equity Over Time */}
-        <div>
-          <h3>Current Ratio & Debt-to-Equity</h3>
-          <Line
-            data={ratioDualData}
-            xField="year"
-            yField="value"
-            seriesField="metric"
-            tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
-            yAxis={{ title: { text: 'Ratio' }, label: { formatter: formatNumber } }}
-            height={300}
-          />
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        {/* 5. Return on Assets (ROA) & Return on Equity (ROE) Over Time */}
-        <div>
+        <div style={{ marginTop: '24px' }}>
           <h3>ROA & ROE (%)</h3>
           <Line
             data={returnDualData}
             xField="year"
             yField="value"
             seriesField="metric"
-            tooltip={{ formatter: (item) => ({ name: item.metric, value: `${item.value.toFixed(2)}%` }) }}
+            tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
             yAxis={{ title: { text: 'Return (%)' } }}
             height={300}
+            smooth
+            point={{ size:4 }}
           />
         </div>
+      </Tabs.TabPane>
 
-        {/* 6. Composition of Assets */}
-        <div>
-          <h3>Composition of Assets</h3>
-          <Pie {...pieChartConfig(assetsData, 'Assets Composition')} />
+      {/* Tab 3: Balance Sheet Compositions (3 pie charts together) */}
+      <Tabs.TabPane key="3" tab="Balance Sheet Composition">
+        <div style={{ display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
+          <div style={{ flex: '1' }}>
+            <h3>Assets Composition</h3>
+            <Pie
+              data={assetsData}
+              angleField="value"
+              colorField="category"
+              radius={0.9}
+              label={{ type: 'outer', formatter: (item) => `${item.category}: ${formatNumber(item.value)}` }}
+              tooltip={{ formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })}}
+              height={300}
+              interactions={[{ type: 'element-active' }]}
+            />
+          </div>
+
+          <div style={{ flex: '1' }}>
+            <h3>Liabilities Composition</h3>
+            <Pie
+              data={liabData}
+              angleField="value"
+              colorField="category"
+              radius={0.9}
+              label={{ type: 'outer', formatter: (item) => `${item.category}: ${formatNumber(item.value)}` }}
+              tooltip={{ formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })}}
+              height={300}
+              interactions={[{ type: 'element-active' }]}
+            />
+          </div>
+
+          <div style={{ flex: '1' }}>
+            <h3>Equity Composition</h3>
+            <Pie
+              data={equityData}
+              angleField="value"
+              colorField="category"
+              radius={0.9}
+              label={{ type: 'outer', formatter: (item) => `${item.category}: ${formatNumber(item.value)}` }}
+              tooltip={{ formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })}}
+              height={300}
+              interactions={[{ type: 'element-active' }]}
+            />
+          </div>
         </div>
-      </div>
+      </Tabs.TabPane>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        {/* 7. Composition of Liabilities */}
-        <div>
-          <h3>Composition of Liabilities</h3>
-          <Pie {...pieChartConfig(liabData, 'Liabilities Composition')} />
+      {/* Tab 4: Comparisons */}
+      <Tabs.TabPane key="4" tab="Assets vs Liab+Equity / Operating Profit/Loss">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          <div>
+            <h3>Assets vs Liabilities+Equity Over Time</h3>
+            <Column
+              data={bsMetrics.map(d => [
+                { year: d.year, type: 'Total Assets', value: d.ASSETS },
+                { year: d.year, type: 'Liab+Equity', value: d.LIAB_SH_HLD_EQUITY }
+              ]).flat()}
+              xField="year"
+              yField="value"
+              seriesField="type"
+              tooltip={{ formatter: (item) => ({ name: item.type, value: formatNumber(item.value) }) }}
+              yAxis={{ title: { text: 'Amount ($)' }, label: { formatter: formatNumber } }}
+              height={300}
+            />
+          </div>
+          <div>
+            <h3>Operating Profit/Loss Over Time</h3>
+            <Line
+              data={yearlyAirlineMetrics.map(d => ({
+                year: d.year,
+                value: d.totalOpRevenues - d.totalOpExpenses
+              }))}
+              xField="year"
+              yField="value"
+              yAxis={{ title: { text: 'Op Profit/Loss ($)' }, label: { formatter: formatNumber } }}
+              tooltip={{ formatter: (item) => ({ name: 'Operating Profit/Loss', value: formatNumber(item.value) }) }}
+              height={300}
+              smooth
+              point={{ size:4 }}
+            />
+          </div>
         </div>
-
-        {/* 8. Composition of Equity */}
-        <div>
-          <h3>Composition of Equity</h3>
-          <Pie {...pieChartConfig(equityData, 'Equity Composition')} />
-        </div>
-      </div>
-
-      {/* Add two more charts to reach at least 10 charts total */}
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        {/* 9. Assets vs Liab+Equity Over Time (Check balance) */}
-        <div>
-          <h3>Assets vs Liabilities+Equity Over Time</h3>
-          <Column
-            data={bsMetrics.map(d => [
-              { year: d.year, type: 'Total Assets', value: d.ASSETS },
-              { year: d.year, type: 'Liab+Equity', value: d.LIAB_SH_HLD_EQUITY }
-            ]).flat()}
-            xField="year"
-            yField="value"
-            seriesField="type"
-            tooltip={{ formatter: (item) => ({ name: item.type, value: formatNumber(item.value) }) }}
-            yAxis={{ title: { text: 'Amount ($)' }, label: { formatter: formatNumber } }}
-            height={300}
-          />
-        </div>
-
-        {/* 10. Operating Profit Loss Over Time (From airlineData) */}
-        <div>
-          <h3>Operating Profit/Loss Over Time</h3>
-          <Line
-            data={yearlyAirlineMetrics.map(d => ({ year: d.year, value: d.totalOpRevenues - d.totalOpExpenses }))}
-            xField="year"
-            yField="value"
-            yAxis={{ title: { text: 'Op Profit/Loss ($)' }, label: { formatter: formatNumber } }}
-            tooltip={{ formatter: (item) => ({ name: 'Operating Profit/Loss', value: formatNumber(item.value) }) }}
-            height={300}
-          />
-        </div>
-      </div>
-    </div>
+      </Tabs.TabPane>
+    </Tabs>
   );
 };
 
