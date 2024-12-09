@@ -195,19 +195,15 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
               data={revExpData}
               xField="year"
               yField="value"
-              colorField='type'
-              seriesField='type'
-              axis={{
-                y: {
-                  title: '($)',
-                  labelFormatter: formatNumber,
-                }
+              seriesField="type"
+              yAxis={{
+                title: { text: '($)' },
+                label: {
+                  formatter: formatNumber,
+                },
               }}
-              stack={{
-                groupBy: ['x', 'series'],
-                series: false,
-              }}
-              scale={{ color: { range: ['#E64B35', '#8B7CB3'] } }}
+              isStack={true} // For stacked columns
+              color={['#E64B35', '#8B7CB3']}
               height={400}
               style={{
                 radiusTopLeft: 8,
