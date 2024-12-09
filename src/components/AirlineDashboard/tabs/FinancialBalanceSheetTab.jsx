@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Statistic, Select } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
-import IncomeStatementSankeyChart from '../../charts/IncomeStatementSankeyChart'; // Import the Sankey chart component
+import IncomeStatementSankeyChart from '../charts/IncomeStatementSankeyChart'; // Import the Sankey chart component
 
 const { Option } = Select;
 
