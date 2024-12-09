@@ -1,10 +1,6 @@
-// src/components/AirlineDashboard/tabs/FinancialBalanceSheetTab.jsx
 import React, { useState, useMemo } from 'react';
-import { Row, Col, Card, Statistic } from 'antd';
-import { Select } from 'antd';
-import PropTypes from 'prop-types';
+import { Row, Col, Card, Statistic, Select } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
-import IncomeStatementSankeyChart from '../charts/IncomeStatementSankeyChart';
 
 const { Option } = Select;
 
@@ -80,7 +76,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
 
   return (
     <div style={{ marginTop: '20px' }}>
-      {/* Existing Filters */}
+      {/* Filters */}
       <Row gutter={16} style={{ marginBottom: '24px' }}>
         <Col>
           <Select
@@ -184,16 +180,8 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
           </Col>
         </Row>
       </div>
-
-      {/* Sankey Chart Component */}
-      <IncomeStatementSankeyChart airlineData={airlineData} balanceSheets={balanceSheets} />
     </div>
   );
-};
-
-FinancialBalanceSheetTab.propTypes = {
-  airlineData: PropTypes.array.isRequired,
-  balanceSheets: PropTypes.array.isRequired,
 };
 
 export default React.memo(FinancialBalanceSheetTab);
