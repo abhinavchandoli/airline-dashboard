@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Statistic, Select } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
 import FinancialBalanceSheetCharts from '../charts/FinancialBalanceSheetCharts';
-import CorrelationAnalysis from './CorrelationAnalysis';
+import FinancialCorrelationChart from '../charts/FinancialCorrelationChart';
 
 const { Option } = Select;
 
@@ -179,11 +179,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
 
       {/* Tabbed charts */}
       <FinancialBalanceSheetCharts airlineData={filteredAirlineData} balanceSheets={filteredBalanceSheets} />
-      <CorrelationAnalysis 
-        airlineData={airlineData} 
-        operatingData={operatingData} 
-        stockData={stockData} 
-      />
+      <FinancialCorrelationChart airlineData={airlineData} operatingData={operatingData} stockData={stockData} />
     </div>
   );
 };
