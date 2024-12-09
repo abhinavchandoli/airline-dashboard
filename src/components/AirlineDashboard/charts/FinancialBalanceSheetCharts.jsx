@@ -291,15 +291,9 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     data: assetsData,
     angleField: 'value',
     colorField: 'category',
-    radius:0.8,
+    radius:0.9,
     scale: { color: { palette: 'Set2' } },
-    label: {
-        text: `value`,
-        position: 'outside',
-        valueFormatter: formatNumber,
-        labelFormatter: formatNumber
-      },
-      tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
     height:400,
 
   }), [assetsData]);
@@ -308,14 +302,8 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     data: liabData,
     angleField: 'value',
     colorField: 'category',
-    radius:0.8,
+    radius:0.9,
     scale: { color: { palette: 'Set2' } },
-    label: {
-        text:`value`,
-        position: 'outside',
-        valueFormatter: formatNumber,
-        labelFormatter: formatNumber
-      },
     tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
     height:400,
   }), [liabData]);
@@ -324,15 +312,9 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     data: equityData,
     angleField: 'value',
     colorField: 'category',
-    radius:0.8,
+    radius:0.9,
     scale: { color: { palette: 'Set2' } },
-    label: {
-        text: `value`,
-        position: 'outside',
-        valueFormatter: formatNumber,
-        labelFormatter: formatNumber
-      },
-      tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
     height:400,
   }), [equityData]);
 
