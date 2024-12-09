@@ -299,7 +299,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
         valueFormatter: formatNumber,
         labelFormatter: formatNumber
       },
-    tooltip: { items: [{ channel: item.type, valueFormatter: formatNumber }] },
+      tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
     height:400,
 
   }), [assetsData]);
@@ -316,7 +316,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
         valueFormatter: formatNumber,
         labelFormatter: formatNumber
       },
-    tooltip: { items: [{ channel: item.type, valueFormatter: formatNumber }] },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
     height:400,
   }), [liabData]);
 
@@ -332,7 +332,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
         valueFormatter: formatNumber,
         labelFormatter: formatNumber
       },
-    tooltip: { items: [{ channel: item.type, valueFormatter: formatNumber }] },
+      tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
     height:400,
   }), [equityData]);
 
