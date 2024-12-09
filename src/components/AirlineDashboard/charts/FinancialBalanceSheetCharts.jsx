@@ -291,10 +291,10 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     data: assetsData,
     angleField: 'value',
     colorField: 'category',
-    radius:0.9,
+    radius:0.8,
     scale: { color: { palette: 'Set2' } },
     label: {
-        text: (d) => `value`,
+        text: `value`,
         position: 'outside',
         valueFormatter: formatNumber,
         labelFormatter: formatNumber
@@ -308,10 +308,10 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     data: liabData,
     angleField: 'value',
     colorField: 'category',
-    radius:0.9,
+    radius:0.8,
     scale: { color: { palette: 'Set2' } },
     label: {
-        text: (d) => `value`,
+        text:`value`,
         position: 'outside',
         valueFormatter: formatNumber,
         labelFormatter: formatNumber
@@ -324,10 +324,10 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     data: equityData,
     angleField: 'value',
     colorField: 'category',
-    radius:0.9,
+    radius:0.8,
     scale: { color: { palette: 'Set2' } },
     label: {
-        text: (d) => `value`,
+        text: `value`,
         position: 'outside',
         valueFormatter: formatNumber,
         labelFormatter: formatNumber
