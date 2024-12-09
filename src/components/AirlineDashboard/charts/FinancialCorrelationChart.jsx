@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Checkbox } from 'antd';
-import {DualAxes } from '@ant-design/plots';
+import { Card, Select } from 'antd';
+import { DualAxes } from '@ant-design/plots';
 import Big from 'big.js';
-
 import { formatNumber } from '../../../utils/formatNumber';
+
+const { Option } = Select;
 
 const METRICS = [
   { key: 'ASM', label: 'ASM' },
@@ -18,7 +19,6 @@ const METRICS = [
   { key: 'TRANS_REV_PAX', label: 'Transport Revenue - Pax ($)' },
   { key: 'FUEL_FLY_OPS', label: 'Fuel Expense ($)' },
 ];
-
 
 function aggregateDataByYear(data, metric) {
   const aggregated = {};
@@ -77,7 +77,7 @@ function aggregateYieldByYear(data) {
 }
 
 export default function FinancialCorrelationChart({ airlineData, operatingData, stockData }) {
-  const [selectedMetrics, setSelectedMetrics] = useState(METRICS.map(m => m.key));
+  const [selectedMetrics, setSelectedMetrics] = useState(['ASM']); // Default selection is ASM
 
   const asmData = useMemo(() => aggregateDataByYear(airlineData, 'ASM'), [airlineData]);
   const rpmData = useMemo(() => aggregateDataByYear(airlineData, 'RPM'), [airlineData]);
@@ -122,13 +122,11 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
     ...fuelData,
   ],[asmData,rpmData,lfData,yieldData,casmData,rasmData,prasmData,opRevData,opExpData,trpData,fuelData]);
 
-  const filteredMetricsData = useMemo(()=>{
+  const filteredMetricsData = useMemo(()=> {
     return allMetricsData.filter(d=>selectedMetrics.includes(d.metric));
   }, [allMetricsData, selectedMetrics]);
 
   // Merge stock and metric data into a single dataset
-  // We'll have YEAR, stockPrice, metric, value
-  // stockPrice rows won't have metric/value and metric rows won't have stockPrice
   const mergedData = useMemo(()=>{
     const yearSet = new Set();
     stockYearlyData.forEach(d=>yearSet.add(d.YEAR));
@@ -153,11 +151,7 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
     return finalArr.sort((a,b)=>Number(a.YEAR)-Number(b.YEAR));
   },[stockYearlyData, filteredMetricsData]);
 
-const stockDataForChart = useMemo(() => mergedData.filter(d => typeof d.stockPrice === 'number'), [mergedData]);
-const metricsDataForChart = useMemo(() => mergedData.filter(d => typeof d.value === 'number'), [mergedData]);
-
-
-const correlationChartConfig = useMemo(()=>({
+  const correlationChartConfig = useMemo(()=>({
     data: mergedData,
     xField: 'YEAR',
     height: 400,
@@ -203,16 +197,20 @@ const correlationChartConfig = useMemo(()=>({
       items: [{ channel: 'y', valueFormatter: formatNumber}],
     },
   }),[mergedData]);
-  
 
   return (
     <Card title="Correlation with Stock Price" style={{ marginTop: '24px' }}>
       <div style={{ marginBottom: '16px' }}>
-        <Checkbox.Group
-          options={METRICS.map(m => ({ label: m.label, value: m.key }))}
+        <Select
+          mode="multiple"
+          allowClear
+          style={{ width: 300 }}
+          placeholder="Select Metrics"
           value={selectedMetrics}
           onChange={(vals) => setSelectedMetrics(vals)}
-        />
+        >
+          {METRICS.map(m => <Option key={m.key} value={m.key}>{m.label}</Option>)}
+        </Select>
       </div>
       <DualAxes {...correlationChartConfig} />
     </Card>
