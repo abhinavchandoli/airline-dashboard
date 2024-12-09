@@ -68,7 +68,7 @@ function computeBalanceSheetMetrics(balanceSheets, airlineData) {
     const totalNetIncome = airlineMetrics.totalNetIncome || 0;
 
     const currentRatio = (CURR_LIABILITIES !== 0) ? (CURR_ASSETS / CURR_LIABILITIES) : null;
-    const debtToEquity = (SH_HLD_EQUIT_NET && SH_HLD_EQUIT_NET !== 0) 
+    const debtToEquity = (SH_HLD_EQUIT_NET && SH_HLD_EQUIT_NET !== 0)
       ? ((LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET)
       : null;
     const roa = (ASSETS !== 0) ? (totalNetIncome / ASSETS) * 100 : null;
@@ -96,7 +96,7 @@ function computeBalanceSheetMetrics(balanceSheets, airlineData) {
 function getBalanceSheetCompositionData(balanceSheetData) {
   if (!balanceSheetData || balanceSheetData.length === 0) return { assetsData: [], liabData: [], equityData: [] };
 
-  const bs = balanceSheetData[balanceSheetData.length - 1]; 
+  const bs = balanceSheetData[balanceSheetData.length - 1];
   const assetsData = [
     { category: 'Current Assets', value: bs.CURR_ASSETS || 0 },
     { category: 'Property & Equipment Net', value: bs.PROP_EQUIP_NET || 0 },
@@ -162,28 +162,35 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     revExpData.push({ year: d.year, metric: 'Operating Expenses', value: d.totalOpExpenses });
   });
 
-  // Tabs configuration using items
   const tabItems = [
     {
       key: '1',
       label: 'Income & Profitability',
       children: (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-            <h3>Net Income Over Time</h3>
+            <h4>Net Income Over Time</h4>
             <Line
               data={yearlyAirlineMetrics}
               xField="year"
               yField="totalNetIncome"
-              height={300}
-              yAxis={{ title: { text: 'Net Income ($)' }, label: { formatter: formatNumber } }}
-              tooltip={{ formatter: (item) => ({ name: 'Net Income', value: formatNumber(item.totalNetIncome) })}}
-              smooth
-              point={{ size:4 }}
+              height={400}
+              style={{
+                stroke: '#2892d7',
+                shape:'smooth',
+                lineWidth: 2,
+              }}
+              axis={{
+                y: {
+                  title: '($)',
+                  labelFormatter: formatNumber,
+                }
+              }}
+              tooltip ={{items: [{ channel: 'y', valueFormatter: formatNumber}] }}
             />
           </div>
           <div>
-            <h3>Operating Revenues vs Operating Expenses</h3>
+            <h4>Operating Revenues vs Operating Expenses</h4>
             <Column
               data={revExpData}
               xField="year"
@@ -202,40 +209,37 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
       key: '2',
       label: 'Margins & Ratios',
       children: (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            <div>
-              <h3>Operating & Net Profit Margins (%)</h3>
-              <Line
-                data={marginDualData}
-                xField="year"
-                yField="value"
-                seriesField="metric"
-                yAxis={{ title: { text: 'Margin (%)' } }}
-                tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
-                height={300}
-                smooth
-                point={{ size:4 }}
-              />
-            </div>
-            <div>
-              <h3>Current Ratio & Debt-to-Equity</h3>
-              <Line
-                data={ratioDualData}
-                xField="year"
-                yField="value"
-                seriesField="metric"
-                tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
-                yAxis={{ title: { text: 'Ratio' }, label: { formatter: formatNumber } }}
-                height={300}
-                smooth
-                point={{ size:4 }}
-              />
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div>
+            <h4>Operating & Net Profit Margins (%)</h4>
+            <Line
+              data={marginDualData}
+              xField="year"
+              yField="value"
+              seriesField="metric"
+              yAxis={{ title: { text: 'Margin (%)' } }}
+              tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
+              height={300}
+              smooth
+              point={{ size:4 }}
+            />
           </div>
-
-          <div style={{ marginTop: '24px' }}>
-            <h3>ROA & ROE (%)</h3>
+          <div>
+            <h4>Current Ratio & Debt-to-Equity</h4>
+            <Line
+              data={ratioDualData}
+              xField="year"
+              yField="value"
+              seriesField="metric"
+              tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
+              yAxis={{ title: { text: 'Ratio' }, label: { formatter: formatNumber } }}
+              height={300}
+              smooth
+              point={{ size:4 }}
+            />
+          </div>
+          <div>
+            <h4>ROA & ROE (%)</h4>
             <Line
               data={returnDualData}
               xField="year"
@@ -248,16 +252,16 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
               point={{ size:4 }}
             />
           </div>
-        </>
+        </div>
       ),
     },
     {
       key: '3',
       label: 'Balance Sheet Composition',
       children: (
-        <div style={{ display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
-          <div style={{ flex: '1' }}>
-            <h3>Assets Composition</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div>
+            <h4>Assets Composition</h4>
             <Pie
               data={assetsData}
               angleField="value"
@@ -270,8 +274,8 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
             />
           </div>
 
-          <div style={{ flex: '1' }}>
-            <h3>Liabilities Composition</h3>
+          <div>
+            <h4>Liabilities Composition</h4>
             <Pie
               data={liabData}
               angleField="value"
@@ -284,8 +288,8 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
             />
           </div>
 
-          <div style={{ flex: '1' }}>
-            <h3>Equity Composition</h3>
+          <div>
+            <h4>Equity Composition</h4>
             <Pie
               data={equityData}
               angleField="value"
@@ -304,9 +308,9 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
       key: '4',
       label: 'Assets vs Liab+Equity / Operating Profit/Loss',
       children: (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-            <h3>Assets vs Liabilities+Equity Over Time</h3>
+            <h4>Assets vs Liabilities+Equity Over Time</h4>
             <Column
               data={bsMetrics.map(d => [
                 { year: d.year, type: 'Total Assets', value: d.ASSETS },
@@ -321,7 +325,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
             />
           </div>
           <div>
-            <h3>Operating Profit/Loss Over Time</h3>
+            <h4>Operating Profit/Loss Over Time</h4>
             <Line
               data={yearlyAirlineMetrics.map(d => ({
                 year: d.year,
