@@ -1,24 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Statistic, Select } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
-import IncomeStatementSankeyChart from '../charts/IncomeStatementSankeyChart'; // Import the Sankey chart component
 
 const { Option } = Select;
 
 const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
   const [selectedYear, setSelectedYear] = useState('All');
   const [selectedQuarter, setSelectedQuarter] = useState('All');
-  
-  // New state for Sankey chart year filter
-  const [sankeySelectedYear, setSankeySelectedYear] = useState('All');
 
   const getAvailableYears = () => {
     const yearsSet = new Set(airlineData.map(d => d.YEAR));
     balanceSheets.forEach(d => yearsSet.add(d.YEAR));
-    // Include years from 2001 to 2024
-    for (let y = 2001; y <= 2024; y++) {
-      yearsSet.add(y);
-    }
     return Array.from(yearsSet).filter(Boolean).sort((a, b) => a - b);
   };
 
@@ -82,40 +74,9 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
     roe = (totalNetIncome / SH_HLD_EQUIT_NET) * 100;
   }
 
-  // Prepare data for Sankey chart
-  const sankeyDataForYear = useMemo(() => {
-    if (sankeySelectedYear === 'All') {
-      // Aggregate data for all years
-      const aggregatedData = airlineData.reduce((acc, row) => {
-        Object.keys(row).forEach(key => {
-          if (typeof row[key] === 'number') {
-            acc[key] = (acc[key] || 0) + row[key];
-          }
-        });
-        return acc;
-      }, {});
-
-      // Include balance sheet data
-      balanceSheets.forEach(bs => {
-        Object.keys(bs).forEach(key => {
-          if (typeof bs[key] === 'number') {
-            aggregatedData[key] = (aggregatedData[key] || 0) + bs[key];
-          }
-        });
-      });
-
-      return aggregatedData;
-    } else {
-      // Find the data for the selected year
-      const data = airlineData.find(d => d.YEAR === Number(sankeySelectedYear));
-      const bs = balanceSheets.find(d => d.YEAR === Number(sankeySelectedYear));
-      return { ...data, ...bs };
-    }
-  }, [sankeySelectedYear, airlineData, balanceSheets]);
-
   return (
     <div style={{ marginTop: '20px' }}>
-      {/* Existing Filters */}
+      {/* Filters */}
       <Row gutter={16} style={{ marginBottom: '24px' }}>
         <Col>
           <Select
@@ -218,34 +179,6 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
             </Card>
           </Col>
         </Row>
-      </div>
-
-      {/* Sankey Chart Filter */}
-      <div style={{ marginTop: '40px' }}>
-        <Row gutter={16} style={{ marginBottom: '16px' }}>
-          <Col>
-            <Select
-              className="custom-card"
-              style={{ width: 200 }}
-              placeholder="Select Year for Sankey Chart"
-              value={sankeySelectedYear}
-              onChange={val => setSankeySelectedYear(val)}
-            >
-              <Option value="All">All Years</Option>
-              {[...Array(24)].map((_, index) => {
-                const year = 2001 + index;
-                return (
-                  <Option key={year} value={year.toString()}>
-                    {year}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Col>
-        </Row>
-
-        {/* Sankey Chart */}
-        <IncomeStatementSankeyChart data={sankeyDataForYear} />
       </div>
     </div>
   );
