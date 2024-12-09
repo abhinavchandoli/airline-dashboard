@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, Checkbox } from 'antd';
-import { DualAxes } from '@ant-design/plots';
+import {DualAxes } from '@ant-design/plots';
 import Big from 'big.js';
 
-// Metrics to provide
 const METRICS = [
   { key: 'ASM', label: 'ASM' },
   { key: 'RPM', label: 'RPM' },
@@ -18,6 +17,13 @@ const METRICS = [
   { key: 'FUEL_FLY_OPS', label: 'Fuel Expense ($)' },
 ];
 
+function formatNumber(val) {
+  if (val >= 1e9) return (val/1e9).toFixed(2) + 'B';
+  if (val >= 1e6) return (val/1e6).toFixed(2) + 'M';
+  if (val >= 1e3) return (val/1e3).toFixed(2) + 'K';
+  return val.toString();
+}
+
 function aggregateDataByYear(data, metric) {
   const aggregated = {};
   data.forEach(item => {
@@ -29,16 +35,14 @@ function aggregateDataByYear(data, metric) {
     }
     aggregated[year] = aggregated[year].plus(value);
   });
-
   return Object.keys(aggregated).map(year => ({
     YEAR: year,
-    metric: metric,
+    metric,
     value: aggregated[year].toNumber(),
   })).sort((a,b) => Number(a.YEAR)-Number(b.YEAR));
 }
 
 function aggregateAverageStockPriceByYear(stockData) {
-  // Aggregate daily stock prices into yearly average
   const aggregated = {};
   stockData.forEach(item => {
     const date = new Date(item.Date);
@@ -47,7 +51,7 @@ function aggregateAverageStockPriceByYear(stockData) {
     if (!aggregated[year]) {
       aggregated[year] = { total: Big(0), count: 0 };
     }
-    aggregated[year].total = aggregated[year].total.plus(Big(adjClose));
+    aggregated[year].total = aggregated[year].total.plus(adjClose);
     aggregated[year].count += 1;
   });
 
@@ -58,8 +62,6 @@ function aggregateAverageStockPriceByYear(stockData) {
 }
 
 function aggregateYieldByYear(data) {
-  // YIELD might be already per-mile cost, we just sum and average
-  // Similar to other metrics, we do a simple average if multiple rows per year
   const aggregated = {};
   data.forEach(item => {
     const year = item.YEAR ? item.YEAR.toString() : null;
@@ -74,18 +76,17 @@ function aggregateYieldByYear(data) {
   return Object.keys(aggregated).map(year => ({
     YEAR: year,
     metric: 'YIELD',
-    value: aggregated[year].count > 0 ? aggregated[year].total / aggregated[year].count * 1e6 : 0,
+    value: aggregated[year].count > 0 ? (aggregated[year].total / aggregated[year].count)*1e6 : 0,
   })).sort((a,b) => Number(a.YEAR)-Number(b.YEAR));
 }
 
-const FinancialCorrelationChart = ({ airlineData, operatingData, stockData }) => {
+export default function FinancialCorrelationChart({ airlineData, operatingData, stockData }) {
   const [selectedMetrics, setSelectedMetrics] = useState(METRICS.map(m => m.key));
 
-  // Aggregate metrics by year
   const asmData = useMemo(() => aggregateDataByYear(airlineData, 'ASM'), [airlineData]);
   const rpmData = useMemo(() => aggregateDataByYear(airlineData, 'RPM'), [airlineData]);
+
   const lfData = useMemo(() => {
-    // LOAD_FACTOR = sum(RPM)/sum(ASM)*100
     const yearMap = {};
     airlineData.forEach(item => {
       const year = item.YEAR ? item.YEAR.toString() : null;
@@ -97,91 +98,111 @@ const FinancialCorrelationChart = ({ airlineData, operatingData, stockData }) =>
     return Object.keys(yearMap).map(year => ({
       YEAR: year,
       metric: 'LOAD_FACTOR',
-      value: yearMap[year].asm.eq(0) ? 0 : yearMap[year].rpm.div(yearMap[year].asm).times(100).toNumber(),
-    })).sort((a,b) => Number(a.YEAR)-Number(b.YEAR));
+      value: yearMap[year].asm.eq(0)?0:yearMap[year].rpm.div(yearMap[year].asm).times(100).toNumber()
+    })).sort((a,b)=>Number(a.YEAR)-Number(b.YEAR));
   }, [airlineData]);
-  
-  const yieldData = useMemo(() => aggregateYieldByYear(airlineData), [airlineData]);
 
+  const yieldData = useMemo(() => aggregateYieldByYear(airlineData), [airlineData]);
   const casmData = useMemo(() => aggregateDataByYear(airlineData, 'CASM').map(d => ({...d, value: d.value*1e6})), [airlineData]);
   const rasmData = useMemo(() => aggregateDataByYear(airlineData, 'RASM').map(d => ({...d, value: d.value*1e6})), [airlineData]);
   const prasmData = useMemo(() => aggregateDataByYear(airlineData, 'PRASM').map(d => ({...d, value: d.value*1e6})), [airlineData]);
   const opRevData = useMemo(() => aggregateDataByYear(airlineData, 'OP_REVENUES'), [airlineData]);
   const opExpData = useMemo(() => aggregateDataByYear(airlineData, 'OP_EXPENSES'), [airlineData]);
   const trpData = useMemo(() => aggregateDataByYear(airlineData, 'TRANS_REV_PAX'), [airlineData]);
-
   const fuelData = useMemo(() => aggregateDataByYear(operatingData, 'FUEL_FLY_OPS'), [operatingData]);
-
   const stockYearlyData = useMemo(() => aggregateAverageStockPriceByYear(stockData), [stockData]);
 
-  // Combine all metric data into one array
-  const allMetricsData = useMemo(() => {
-    return [
-      ...asmData,
-      ...rpmData,
-      ...lfData,
-      ...yieldData,
-      ...casmData,
-      ...rasmData,
-      ...prasmData,
-      ...opRevData,
-      ...opExpData,
-      ...trpData,
-      ...fuelData,
-    ];
-  }, [asmData, rpmData, lfData, yieldData, casmData, rasmData, prasmData, opRevData, opExpData, trpData, fuelData]);
+  const allMetricsData = useMemo(()=>[
+    ...asmData,
+    ...rpmData,
+    ...lfData,
+    ...yieldData,
+    ...casmData,
+    ...rasmData,
+    ...prasmData,
+    ...opRevData,
+    ...opExpData,
+    ...trpData,
+    ...fuelData,
+  ],[asmData,rpmData,lfData,yieldData,casmData,rasmData,prasmData,opRevData,opExpData,trpData,fuelData]);
 
-  // Filter the metrics data based on selectedMetrics
-  const filteredMetricsData = useMemo(() => {
-    return allMetricsData.filter(d => selectedMetrics.includes(d.metric));
+  const filteredMetricsData = useMemo(()=>{
+    return allMetricsData.filter(d=>selectedMetrics.includes(d.metric));
   }, [allMetricsData, selectedMetrics]);
 
-  // DualAxes data setup:
-  // Left data: stock price
-  // Right data: selected metrics
-  // NOTE: YEAR should be numeric or string consistent. We'll use string.
-  const leftData = useMemo(() => stockYearlyData.filter(d => d.stockPrice !== null), [stockYearlyData]);
-  const rightData = filteredMetricsData;
+  // Merge stock and metric data into a single dataset
+  // We'll have YEAR, stockPrice, metric, value
+  // stockPrice rows won't have metric/value and metric rows won't have stockPrice
+  const mergedData = useMemo(()=>{
+    const yearSet = new Set();
+    stockYearlyData.forEach(d=>yearSet.add(d.YEAR));
+    filteredMetricsData.forEach(d=>yearSet.add(d.YEAR));
 
-  const config = {
-    data: [leftData, rightData],
+    const finalArr = [];
+    // Add stock data rows
+    stockYearlyData.forEach(d => {
+      finalArr.push({
+        YEAR: d.YEAR,
+        stockPrice: d.stockPrice,
+      });
+    });
+    // Add metrics data rows
+    filteredMetricsData.forEach(d => {
+      finalArr.push({
+        YEAR: d.YEAR,
+        metric: d.metric,
+        value: d.value,
+      });
+    });
+    return finalArr.sort((a,b)=>Number(a.YEAR)-Number(b.YEAR));
+  },[stockYearlyData, filteredMetricsData]);
+
+  const correlationChartConfig = useMemo(()=>({
+    data: mergedData,
     xField: 'YEAR',
-    yField: ['stockPrice', 'value'],
-    geometryOptions: [
+    height: 400,
+    scale: { y: { nice: false } },
+    children: [
       {
-        geometry: 'line',
-        seriesField: 'stockPrice', // Just one line, no need for seriesField
-        color: '#fa8c16', // stock price line color
-        smooth: true,
-        lineStyle: { lineWidth: 2 },
+        // Stock price line
+        type: 'line',
+        yField:'stockPrice',
+        style: {
+          stroke: 'black',
+          shape:'smooth',
+          lineWidth: 3,
+        },
+        axis:{
+          y:{
+            title:'Stock Price ($)',
+            style:{titleFill:'black'},
+            labelFormatter: formatNumber,
+          },
+        },
       },
       {
-        geometry: 'line',
-        seriesField: 'metric',
-        smooth: true,
-        lineStyle: { lineWidth: 2 },
-        // You can assign different colors using color callback if needed
+        // Metrics lines
+        type:'line',
+        yField:'value',
+        seriesField:'metric',
+        style:{
+          lineWidth:2,
+          shape:'smooth',
+        },
+        axis:{
+          y:{
+            position:'right',
+            title:'Metric Value',
+            style:{titleFill:'#4DBBD5'},
+            labelFormatter: formatNumber,
+          },
+        },
       },
     ],
-    yAxis: {
-      stockPrice: {
-        title: { text: 'Stock Price ($)' },
-      },
-      value: {
-        title: { text: 'Metric Value' },
-      },
-    },
     tooltip: {
-      shared: true,
-      showCrosshairs: true,
+      items: [{ channel: 'y', valueFormatter: formatNumber}],
     },
-    legend: {
-      position: 'top',
-    },
-    interactions: [{ type: 'legend-filter' }, { type: 'tooltip', enable: true }],
-  };
-
-  const allKeys = METRICS.map(m => m.key);
+  }),[mergedData]);
 
   return (
     <Card title="Correlation with Stock Price" style={{ marginTop: '24px' }}>
@@ -192,9 +213,7 @@ const FinancialCorrelationChart = ({ airlineData, operatingData, stockData }) =>
           onChange={(vals) => setSelectedMetrics(vals)}
         />
       </div>
-      <DualAxes {...config} />
+      <DualAxes {...correlationChartConfig} />
     </Card>
   );
-};
-
-export default FinancialCorrelationChart;
+}
