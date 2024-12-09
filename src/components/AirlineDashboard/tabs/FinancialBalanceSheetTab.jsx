@@ -1,7 +1,9 @@
-import React from 'react';
-import { Row, Col, Card, Statistic } from 'antd';
+import React, { useState, useMemo } from 'react';
+import { Row, Col, Card, Statistic, Select } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
 import FinancialBalanceSheetCharts from '../charts/FinancialBalanceSheetCharts';
+
+const { Option } = Select;
 
 const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
   const [selectedYear, setSelectedYear] = useState('All');
@@ -18,6 +20,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
     return [1, 2, 3, 4];
   };
 
+  // Filter data based on selected year and quarter
   const filteredAirlineData = useMemo(() => {
     return airlineData.filter(item => {
       const yearMatch = selectedYear === 'All' || item.YEAR === Number(selectedYear);
@@ -27,47 +30,40 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
   }, [airlineData, selectedYear, selectedQuarter]);
 
   const filteredBalanceSheets = useMemo(() => {
-    const bs = balanceSheets.filter(item => {
+    return balanceSheets.filter(item => {
       const yearMatch = selectedYear === 'All' || item.YEAR === Number(selectedYear);
       const quarterMatch = selectedQuarter === 'All' || item.QUARTER === Number(selectedQuarter);
       return yearMatch && quarterMatch;
     });
-    return bs;
   }, [balanceSheets, selectedYear, selectedQuarter]);
 
-  // Aggregate AirlineData metrics
+  // Aggregate KPIs over filtered data
   const totalOpRevenues = filteredAirlineData.reduce((sum, row) => sum + (row.OP_REVENUES || 0), 0);
   const totalNetIncome = filteredAirlineData.reduce((sum, row) => sum + (row.NET_INCOME || 0), 0);
   const totalOpProfitLoss = filteredAirlineData.reduce((sum, row) => sum + (row.OP_PROFIT_LOSS || 0), 0);
 
-  // For Balance Sheet, take the first record if available
-  const bsRecord = filteredBalanceSheets[0];
-  
-  // Extract needed values from Balance Sheet record
+  const bsRecord = filteredBalanceSheets[filteredBalanceSheets.length - 1];
+
   const CURR_ASSETS = bsRecord?.CURR_ASSETS ?? null;
   const CURR_LIABILITIES = bsRecord?.CURR_LIABILITIES ?? null;
   const ASSETS = bsRecord?.ASSETS ?? null;
   const LIAB_SH_HLD_EQUITY = bsRecord?.LIAB_SH_HLD_EQUITY ?? null;
   const SH_HLD_EQUIT_NET = bsRecord?.SH_HLD_EQUIT_NET ?? null;
 
-  // Compute KPIs
   const operatingMargin = (totalOpRevenues !== 0) ? (totalOpProfitLoss / totalOpRevenues) * 100 : 'N/A';
   const netProfitMargin = (totalOpRevenues !== 0) ? (totalNetIncome / totalOpRevenues) * 100 : 'N/A';
   const currentRatio = (CURR_LIABILITIES && CURR_LIABILITIES !== 0 && CURR_ASSETS) ? (CURR_ASSETS / CURR_LIABILITIES) : 'N/A';
 
-  // Debt-to-Equity Ratio: (LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET
   let debtToEquity = 'N/A';
   if (LIAB_SH_HLD_EQUITY && SH_HLD_EQUIT_NET && SH_HLD_EQUIT_NET !== 0) {
-    debtToEquity = ( (LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET );
+    debtToEquity = ((LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET);
   }
 
-  // ROA = NET_INCOME / ASSETS
   let roa = 'N/A';
   if (totalNetIncome && ASSETS && ASSETS !== 0) {
     roa = (totalNetIncome / ASSETS) * 100;
   }
 
-  // ROE = NET_INCOME / SH_HLD_EQUIT_NET
   let roe = 'N/A';
   if (totalNetIncome && SH_HLD_EQUIT_NET && SH_HLD_EQUIT_NET !== 0) {
     roe = (totalNetIncome / SH_HLD_EQUIT_NET) * 100;
@@ -108,7 +104,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
       </Row>
 
       {/* KPI Cards */}
-      <Row gutter={24}>
+      <Row gutter={24} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} md={8} lg={6}>
           <Card className="custom-card" size="small">
             <Statistic title="Total Operating Revenue" value={totalOpRevenues ? `$${formatNumber(totalOpRevenues)}` : 'N/A'} />
@@ -181,7 +177,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
       </div>
 
       {/* Tabbed charts */}
-      <FinancialBalanceSheetCharts airlineData={airlineData} balanceSheets={balanceSheets} />
+      <FinancialBalanceSheetCharts airlineData={filteredAirlineData} balanceSheets={filteredBalanceSheets} />
     </div>
   );
 };
