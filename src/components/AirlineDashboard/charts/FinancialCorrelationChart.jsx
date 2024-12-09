@@ -157,41 +157,52 @@ const stockDataForChart = useMemo(() => mergedData.filter(d => typeof d.stockPri
 const metricsDataForChart = useMemo(() => mergedData.filter(d => typeof d.value === 'number'), [mergedData]);
 
 
-  const correlationChartConfig = useMemo(() => ({
-    data: [stockDataForChart, metricsDataForChart],
+const correlationChartConfig = useMemo(()=>({
+    data: mergedData,
     xField: 'YEAR',
-    yField: ['stockPrice', 'value'],  // left Y for stockPrice, right Y for value
     height: 400,
-    geometryOptions: [
+    scale: { y: { nice: false } },
+    children: [
       {
-        geometry: 'line',
-        smooth: true,
-        color: 'black',
-        lineStyle: { lineWidth: 3 },
-        // no seriesField for stockPrice since it's a single line
+        // Stock price line
+        type: 'line',
+        yField:'stockPrice',
+        style: {
+          stroke: 'black',
+          shape:'smooth',
+          lineWidth: 3,
+        },
+        axis:{
+          y:{
+            title:'Stock Price ($)',
+            style:{titleFill:'black'},
+            labelFormatter: formatNumber,
+          },
+        },
       },
       {
-        geometry: 'line',
-        smooth: true,
-        seriesField: 'metric',
-        lineStyle: { lineWidth: 2 }
+        // Metrics lines
+        type:'line',
+        yField:'value',
+        seriesField:'metric',
+        style:{
+          lineWidth:2,
+          shape:'smooth',
+        },
+        axis:{
+          y:{
+            position:'right',
+            title:'Metric Value',
+            style:{titleFill:'#4DBBD5'},
+            labelFormatter: formatNumber,
+          },
+        },
       },
     ],
-    meta: {
-      stockPrice: {
-        alias: 'Stock Price ($)',
-        formatter: formatNumber,
-      },
-      value: {
-        alias: 'Metric Value',
-        formatter: formatNumber,
-      }
-    },
     tooltip: {
-      shared: true,    // Show tooltip for both lines together
-      showCrosshairs: true,
-    }
-  }), [stockDataForChart, metricsDataForChart]);
+      items: [{ channel: 'y', valueFormatter: formatNumber}],
+    },
+  }),[mergedData]);
   
 
   return (
