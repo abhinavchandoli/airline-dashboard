@@ -169,7 +169,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
       children: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-            <h4>Net Income Over Time</h4>
+            <h4>Net Income</h4>
             <Line
               data={yearlyAirlineMetrics}
               xField="year"
@@ -195,11 +195,27 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
               data={revExpData}
               xField="year"
               yField="value"
-              seriesField="metric"
-              legend={{ position: 'top' }}
-              tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
-              height={300}
-              yAxis={{ title: { text: 'Amount ($)' }, label: { formatter: formatNumber } }}
+              colorField='type'
+              seriesField='type'
+              axis={{
+                y: {
+                  title: '($)',
+                  labelFormatter: formatNumber,
+                }
+              }}
+              stack={{
+                groupBy: ['x', 'series'],
+                series: false,
+              }}
+              scale={{ color: { range: ['#E64B35', '#8B7CB3'] } }}
+              height={400}
+              style={{
+                radiusTopLeft: 8,
+                radiusTopRight: 8,
+                radiusBottomLeft: 8,
+                radiusBottomRight: 8,
+              }}
+              tooltip={{ items: [{ channel: 'y', valueFormatter: formatNumber }] }}
             />
           </div>
         </div>
