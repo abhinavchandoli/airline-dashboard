@@ -198,12 +198,18 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     xField: 'year',
     yField: 'value',
     seriesField: 'type',
-    yAxis: {
-      title: '($)',
-      labelFormatter: formatNumber,
+    colorField:'type',
+    axis: {
+        y: {
+          title: '($)',
+          labelFormatter: formatNumber,
+        }
+      },
+    stack: {
+        groupBy: ['x', 'series'],
+        series: false,
     },
-    isStack: true,
-    color: ['#E64B35', '#8B7CB3'],
+    scale: { color: { range: ['#E64B35', '#8B7CB3'] } },
     height: 400,
     style: {
       radiusTopLeft: 8,
@@ -219,11 +225,24 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     xField: 'year',
     yField: 'value',
     seriesField: 'metric',
-    yAxis: { title: 'Margin (%)' },
-    tooltip: { formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) },
-    height: 300,
-    smooth: true,
-    point: { size:4 },
+    colorField:'metric',
+    axis: {
+        y: {
+          title: '(%)',
+          labelFormatter: formatNumber,
+        }
+      },
+    scale: {
+        color: {
+          palette: ['#41b6c4', '#225ea8'],
+        },
+    },
+    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
+    height: 400,
+    style: {
+        shape: 'smooth',
+        lineWidth: 2,
+      },
   }), [marginDualData]);
 
   const ratioChartConfig = useMemo(() => ({
@@ -233,7 +252,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     seriesField: 'metric',
     tooltip: { formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) },
     yAxis: { title: 'Ratio', labelFormatter: formatNumber },
-    height: 300,
+    height: 400,
     smooth: true,
     point: { size:4 },
   }), [ratioDualData]);
