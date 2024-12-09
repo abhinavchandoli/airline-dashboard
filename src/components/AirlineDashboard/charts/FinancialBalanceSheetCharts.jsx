@@ -323,20 +323,45 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     xField: 'year',
     yField: 'value',
     seriesField: 'type',
-    tooltip:{ formatter: (item) => ({ name: item.type, value: formatNumber(item.value) }) },
-    yAxis:{ title:'Amount ($)', labelFormatter: formatNumber },
-    height:300,
+    colorField:'type',
+    axis: {
+        y: {
+          title: 'Amount',
+          labelFormatter: formatNumber,
+        }
+      },
+    stack: {
+        groupBy: ['x', 'series'],
+        series: false,
+    },
+    scale: { color: { range: ['#3C5488', '#4DBBD5'] } },
+    height: 400,
+    style: {
+      radiusTopLeft: 8,
+      radiusTopRight: 8,
+      radiusBottomLeft: 8,
+      radiusBottomRight: 8,
+    },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
   }), [assetsLiabData]);
 
   const opProfitLossChartConfig = useMemo(() => ({
     data: opProfitLossData,
     xField:'year',
     yField:'value',
-    yAxis:{ title:'Op Profit/Loss ($)', labelFormatter: formatNumber },
-    tooltip:{ formatter: (item) => ({ name:'Operating Profit/Loss', value: formatNumber(item.value) }) },
-    height:300,
-    smooth:true,
-    point:{ size:4 },
+    height: 400,
+    style: {
+      stroke: '#2892d7',
+      shape:'smooth',
+      lineWidth: 2,
+    },
+    axis: {
+      y: {
+        title: '($)',
+        labelFormatter: formatNumber,
+      }
+    },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
   }), [opProfitLossData]);
 
   const tabItems = [
