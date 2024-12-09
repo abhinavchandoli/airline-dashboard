@@ -82,7 +82,11 @@ const AirlineDashboard = () => {
     {
       key: '4',
       label: 'Financial & Balance Sheet',
-      children: <FinancialBalanceSheetTab airlineData={airlineData} balanceSheets={balanceSheets} />,
+      children: <FinancialBalanceSheetTab   
+        airlineData={airlineData} 
+        balanceSheets={balanceSheets} 
+        operatingData={operatingData} 
+        stockData={stockData} />,
     },
   ];
 
