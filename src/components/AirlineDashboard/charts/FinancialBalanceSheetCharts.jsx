@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
+import { Card, Tabs } from 'antd';
 import { Line, Column, Pie } from '@ant-design/plots';
-import { Tabs } from 'antd';
-import Big from 'big.js';
 import { formatNumber } from '../../../utils/formatNumber';
 
 // Helper functions
@@ -127,7 +126,6 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
   const bsMetrics = useMemo(() => computeBalanceSheetMetrics(balanceSheets, airlineData), [balanceSheets, airlineData]);
   const { assetsData, liabData, equityData } = useMemo(() => getBalanceSheetCompositionData(balanceSheets), [balanceSheets]);
 
-  // Prepare data sets
   const marginDualData = [];
   yearlyAirlineMetrics.forEach(d => {
     if (d.operatingMargin !== null) {
@@ -164,10 +162,12 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     revExpData.push({ year: d.year, metric: 'Operating Expenses', value: d.totalOpExpenses });
   });
 
-  return (
-    <Tabs defaultActiveKey="1" style={{ marginTop: '24px' }}>
-      {/* Tab 1: Income and Profitability */}
-      <Tabs.TabPane key="1" tab="Income & Profitability">
+  // Tabs configuration using items
+  const tabItems = [
+    {
+      key: '1',
+      label: 'Income & Profitability',
+      children: (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
           <div>
             <h3>Net Income Over Time</h3>
@@ -196,59 +196,65 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
             />
           </div>
         </div>
-      </Tabs.TabPane>
+      ),
+    },
+    {
+      key: '2',
+      label: 'Margins & Ratios',
+      children: (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div>
+              <h3>Operating & Net Profit Margins (%)</h3>
+              <Line
+                data={marginDualData}
+                xField="year"
+                yField="value"
+                seriesField="metric"
+                yAxis={{ title: { text: 'Margin (%)' } }}
+                tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
+                height={300}
+                smooth
+                point={{ size:4 }}
+              />
+            </div>
+            <div>
+              <h3>Current Ratio & Debt-to-Equity</h3>
+              <Line
+                data={ratioDualData}
+                xField="year"
+                yField="value"
+                seriesField="metric"
+                tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
+                yAxis={{ title: { text: 'Ratio' }, label: { formatter: formatNumber } }}
+                height={300}
+                smooth
+                point={{ size:4 }}
+              />
+            </div>
+          </div>
 
-      {/* Tab 2: Margins & Ratios */}
-      <Tabs.TabPane key="2" tab="Margins & Ratios">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-          <div>
-            <h3>Operating & Net Profit Margins (%)</h3>
+          <div style={{ marginTop: '24px' }}>
+            <h3>ROA & ROE (%)</h3>
             <Line
-              data={marginDualData}
+              data={returnDualData}
               xField="year"
               yField="value"
               seriesField="metric"
-              yAxis={{ title: { text: 'Margin (%)' } }}
               tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
+              yAxis={{ title: { text: 'Return (%)' } }}
               height={300}
               smooth
               point={{ size:4 }}
             />
           </div>
-          <div>
-            <h3>Current Ratio & Debt-to-Equity</h3>
-            <Line
-              data={ratioDualData}
-              xField="year"
-              yField="value"
-              seriesField="metric"
-              tooltip={{ formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) }}
-              yAxis={{ title: { text: 'Ratio' }, label: { formatter: formatNumber } }}
-              height={300}
-              smooth
-              point={{ size:4 }}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginTop: '24px' }}>
-          <h3>ROA & ROE (%)</h3>
-          <Line
-            data={returnDualData}
-            xField="year"
-            yField="value"
-            seriesField="metric"
-            tooltip={{ formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) }}
-            yAxis={{ title: { text: 'Return (%)' } }}
-            height={300}
-            smooth
-            point={{ size:4 }}
-          />
-        </div>
-      </Tabs.TabPane>
-
-      {/* Tab 3: Balance Sheet Compositions (3 pie charts together) */}
-      <Tabs.TabPane key="3" tab="Balance Sheet Composition">
+        </>
+      ),
+    },
+    {
+      key: '3',
+      label: 'Balance Sheet Composition',
+      children: (
         <div style={{ display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
           <div style={{ flex: '1' }}>
             <h3>Assets Composition</h3>
@@ -292,10 +298,12 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
             />
           </div>
         </div>
-      </Tabs.TabPane>
-
-      {/* Tab 4: Comparisons */}
-      <Tabs.TabPane key="4" tab="Assets vs Liab+Equity / Operating Profit/Loss">
+      ),
+    },
+    {
+      key: '4',
+      label: 'Assets vs Liab+Equity / Operating Profit/Loss',
+      children: (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
           <div>
             <h3>Assets vs Liabilities+Equity Over Time</h3>
@@ -329,8 +337,19 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
             />
           </div>
         </div>
-      </Tabs.TabPane>
-    </Tabs>
+      ),
+    },
+  ];
+
+  return (
+    <Card className="custom-card" title="Financial Health" style={{ marginTop: '24px' }}>
+      <Tabs
+        defaultActiveKey="1"
+        style={{ marginTop: '-16px' }}
+        destroyInactiveTabPane={true}
+        items={tabItems}
+      />
+    </Card>
   );
 };
 
