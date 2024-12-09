@@ -3,6 +3,8 @@ import { Card, Checkbox } from 'antd';
 import {DualAxes } from '@ant-design/plots';
 import Big from 'big.js';
 
+import { formatNumber } from '../../../utils/formatNumber';
+
 const METRICS = [
   { key: 'ASM', label: 'ASM' },
   { key: 'RPM', label: 'RPM' },
@@ -17,12 +19,6 @@ const METRICS = [
   { key: 'FUEL_FLY_OPS', label: 'Fuel Expense ($)' },
 ];
 
-function formatNumber(val) {
-  if (val >= 1e9) return (val/1e9).toFixed(2) + 'B';
-  if (val >= 1e6) return (val/1e6).toFixed(2) + 'M';
-  if (val >= 1e3) return (val/1e3).toFixed(2) + 'K';
-  return val.toString();
-}
 
 function aggregateDataByYear(data, metric) {
   const aggregated = {};
@@ -157,52 +153,46 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
     return finalArr.sort((a,b)=>Number(a.YEAR)-Number(b.YEAR));
   },[stockYearlyData, filteredMetricsData]);
 
-  const correlationChartConfig = useMemo(()=>({
-    data: mergedData,
+const stockDataForChart = useMemo(() => mergedData.filter(d => typeof d.stockPrice === 'number'), [mergedData]);
+const metricsDataForChart = useMemo(() => mergedData.filter(d => typeof d.value === 'number'), [mergedData]);
+
+
+  const correlationChartConfig = useMemo(() => ({
+    data: [stockDataForChart, metricsDataForChart],
     xField: 'YEAR',
+    yField: ['stockPrice', 'value'],  // left Y for stockPrice, right Y for value
     height: 400,
-    scale: { y: { nice: false } },
-    children: [
+    geometryOptions: [
       {
-        // Stock price line
-        type: 'line',
-        yField:'stockPrice',
-        style: {
-          stroke: 'black',
-          shape:'smooth',
-          lineWidth: 3,
-        },
-        axis:{
-          y:{
-            title:'Stock Price ($)',
-            style:{titleFill:'black'},
-            labelFormatter: formatNumber,
-          },
-        },
+        geometry: 'line',
+        smooth: true,
+        color: 'black',
+        lineStyle: { lineWidth: 3 },
+        // no seriesField for stockPrice since it's a single line
       },
       {
-        // Metrics lines
-        type:'line',
-        yField:'value',
-        seriesField:'metric',
-        style:{
-          lineWidth:2,
-          shape:'smooth',
-        },
-        axis:{
-          y:{
-            position:'right',
-            title:'Metric Value',
-            style:{titleFill:'#4DBBD5'},
-            labelFormatter: formatNumber,
-          },
-        },
+        geometry: 'line',
+        smooth: true,
+        seriesField: 'metric',
+        lineStyle: { lineWidth: 2 }
       },
     ],
-    tooltip: {
-      items: [{ channel: 'y', valueFormatter: formatNumber}],
+    meta: {
+      stockPrice: {
+        alias: 'Stock Price ($)',
+        formatter: formatNumber,
+      },
+      value: {
+        alias: 'Metric Value',
+        formatter: formatNumber,
+      }
     },
-  }),[mergedData]);
+    tooltip: {
+      shared: true,    // Show tooltip for both lines together
+      showCrosshairs: true,
+    }
+  }), [stockDataForChart, metricsDataForChart]);
+  
 
   return (
     <Card title="Correlation with Stock Price" style={{ marginTop: '24px' }}>
