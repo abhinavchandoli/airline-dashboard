@@ -209,7 +209,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
         groupBy: ['x', 'series'],
         series: false,
     },
-    scale: { color: { range: ['#E64B35', '#8B7CB3'] } },
+    scale: { color: { range: ['#3C5488', '#4DBBD5'] } },
     height: 400,
     style: {
       radiusTopLeft: 8,
@@ -242,7 +242,7 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     style: {
         shape: 'smooth',
         lineWidth: 2,
-      },
+    },
   }), [marginDualData]);
 
   const ratioChartConfig = useMemo(() => ({
@@ -250,11 +250,20 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     xField: 'year',
     yField: 'value',
     seriesField: 'metric',
-    tooltip: { formatter: (item) => ({ name: item.metric, value: formatNumber(item.value) }) },
-    yAxis: { title: 'Ratio', labelFormatter: formatNumber },
+    colorField:'metric',
+    axis: {
+        y: {
+          title: 'Ratio',
+          labelFormatter: formatNumber,
+        }
+      },
+    scale: { color: { palette: 'Set2' } },
+    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
     height: 400,
-    smooth: true,
-    point: { size:4 },
+    style: {
+        shape: 'smooth',
+        lineWidth: 2,
+    },
   }), [ratioDualData]);
 
   const roaRoeChartConfig = useMemo(() => ({
@@ -262,11 +271,20 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     xField: 'year',
     yField: 'value',
     seriesField: 'metric',
-    tooltip: { formatter: (item) => ({ name: item.metric, value: item.value.toFixed(2) + '%' }) },
-    yAxis: { title: 'Return (%)' },
-    height: 300,
-    smooth: true,
-    point: { size:4 },
+    colorField:'metric',
+    axis: {
+        y: {
+          title: 'Return (%)',
+          labelFormatter: formatNumber,
+        }
+      },
+    scale: { color: { palette: 'Set2' } },
+    tooltip: {items: [{ channel: 'y', valueFormatter: '.2f'}] },
+    height: 400,
+    style: {
+        shape: 'smooth',
+        lineWidth: 2,
+    },
   }), [returnDualData]);
 
   const assetsPieChartConfig = useMemo(() => ({
