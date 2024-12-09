@@ -429,11 +429,11 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
       children: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-            <h4>Assets vs Liabilities+Equity Over Time</h4>
+            <h4>Assets vs Liabilities+Equity</h4>
             <Column {...assetsLiabChartConfig} />
           </div>
           <div>
-            <h4>Operating Profit/Loss Over Time</h4>
+            <h4>Operating Profit/Loss</h4>
             <Line {...opProfitLossChartConfig} />
           </div>
         </div>

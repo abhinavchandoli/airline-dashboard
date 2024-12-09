@@ -1,26 +1,22 @@
+// FinancialBalanceSheetTab.jsx
+
 import React, { useState, useMemo } from 'react';
-import { Row, Col, Card, Statistic, Select } from 'antd';
+import { Row, Col, Card, Statistic, Select, Table } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
 import FinancialBalanceSheetCharts from '../charts/FinancialBalanceSheetCharts';
+import { pearsonCorrelation } from '../../../utils/statistics';
+import { Heatmap } from '@ant-design/plots'; // Assuming @ant-design/plots >=4 for Heatmap
+// If Heatmap is not supported, you can fallback to a Column or Table display.
+
+// Assume metrics: ASM, RPM, LOAD_FACTOR, YIELD, RASM, CASM, Fuel Expense (FUEL_FLY_OPS), Operating Revenue (OP_REVENUES), Operating Expense (OP_EXPENSES)
 
 const { Option } = Select;
 
-const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
+const FinancialBalanceSheetTab = ({ airlineData, balanceSheets, stockData }) => {
   const [selectedYear, setSelectedYear] = useState('All');
   const [selectedQuarter, setSelectedQuarter] = useState('All');
 
-  const getAvailableYears = () => {
-    const yearsSet = new Set(airlineData.map(d => d.YEAR));
-    balanceSheets.forEach(d => yearsSet.add(d.YEAR));
-    return Array.from(yearsSet).filter(Boolean).sort((a, b) => a - b);
-  };
-
-  const getAvailableQuarters = () => {
-    // Quarters are typically 1-4
-    return [1, 2, 3, 4];
-  };
-
-  // Filter data based on selected year and quarter
+  // Filter data by year/quarter as before
   const filteredAirlineData = useMemo(() => {
     return airlineData.filter(item => {
       const yearMatch = selectedYear === 'All' || item.YEAR === Number(selectedYear);
@@ -37,7 +33,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
     });
   }, [balanceSheets, selectedYear, selectedQuarter]);
 
-  // Aggregate KPIs over filtered data
+  // Aggregate KPIs over filtered data (as existing logic)
   const totalOpRevenues = filteredAirlineData.reduce((sum, row) => sum + (row.OP_REVENUES || 0), 0);
   const totalNetIncome = filteredAirlineData.reduce((sum, row) => sum + (row.NET_INCOME || 0), 0);
   const totalOpProfitLoss = filteredAirlineData.reduce((sum, row) => sum + (row.OP_PROFIT_LOSS || 0), 0);
@@ -68,6 +64,199 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
   if (totalNetIncome && SH_HLD_EQUIT_NET && SH_HLD_EQUIT_NET !== 0) {
     roe = (totalNetIncome / SH_HLD_EQUIT_NET) * 100;
   }
+
+  // -----------------------------
+  // Correlation Section
+  // -----------------------------
+  // We'll compute correlation on a yearly basis:
+  // 1. Extract yearly averages of stockData 'Adj Close'
+  // 2. Extract yearly metrics from airlineData:
+  //    ASM, RPM, LOAD_FACTOR, YIELD, CASM, RASM, FUEL_FLY_OPS, OP_REVENUES, OP_EXPENSES
+
+  const yearlyStockData = useMemo(() => {
+    if (!stockData || stockData.length === 0) return [];
+
+    // Convert dates and sort
+    const sorted = stockData.map(d => ({...d, Date: new Date(d.Date)})).sort((a,b) => a.Date - b.Date);
+    const groupedByYear = {};
+
+    // For simplicity, we take the last data point of each year as representative
+    sorted.forEach(d => {
+      const y = d.Date.getFullYear().toString();
+      if (!groupedByYear[y]) {
+        groupedByYear[y] = [];
+      }
+      groupedByYear[y].push(d['Adj Close']);
+    });
+
+    return Object.keys(groupedByYear).map(year => {
+      const prices = groupedByYear[year].map(Number).filter(Boolean);
+      const avgPrice = prices.reduce((acc, val) => acc+val, 0)/prices.length || null;
+      return {YEAR: year, stockPrice: avgPrice};
+    });
+  }, [stockData]);
+
+  const yearlyMetrics = useMemo(() => {
+    // Filter data by year regardless of selected filters, we want all available
+    const groupedByYear = {};
+
+    airlineData.forEach(d => {
+      const y = d.YEAR ? d.YEAR.toString() : null;
+      if (!y) return;
+      if (!groupedByYear[y]) {
+        groupedByYear[y] = {
+          ASM: 0, RPM: 0, LOAD_FACTOR_SUM: 0, LOAD_FACTOR_COUNT:0,
+          YIELD_SUM:0, YIELD_COUNT:0,
+          CASM_SUM:0, CASM_COUNT:0,
+          RASM_SUM:0, RASM_COUNT:0,
+          FUEL_FLY_OPS:0, OP_REVENUES:0, OP_EXPENSES:0
+        };
+      }
+      groupedByYear[y].ASM += (d.ASM || 0);
+      groupedByYear[y].RPM += (d.RPM || 0);
+
+      if (d.LOAD_FACTOR != null) {
+        groupedByYear[y].LOAD_FACTOR_SUM += d.LOAD_FACTOR;
+        groupedByYear[y].LOAD_FACTOR_COUNT += 1;
+      }
+
+      if (d.YIELD != null) {
+        groupedByYear[y].YIELD_SUM += d.YIELD;
+        groupedByYear[y].YIELD_COUNT += 1;
+      }
+
+      if (d.CASM != null) {
+        groupedByYear[y].CASM_SUM += d.CASM;
+        groupedByYear[y].CASM_COUNT += 1;
+      }
+
+      if (d.RASM != null) {
+        groupedByYear[y].RASM_SUM += d.RASM;
+        groupedByYear[y].RASM_COUNT += 1;
+      }
+
+      groupedByYear[y].FUEL_FLY_OPS += (d.FUEL_FLY_OPS || 0);
+      groupedByYear[y].OP_REVENUES += (d.OP_REVENUES || 0);
+      groupedByYear[y].OP_EXPENSES += (d.OP_EXPENSES || 0);
+    });
+
+    return Object.keys(groupedByYear).map(y => {
+      const g = groupedByYear[y];
+      const load_factor = g.LOAD_FACTOR_COUNT ? g.LOAD_FACTOR_SUM/g.LOAD_FACTOR_COUNT : null;
+      const avg_yield = g.YIELD_COUNT ? g.YIELD_SUM/g.YIELD_COUNT : null;
+      const avg_casm = g.CASM_COUNT ? g.CASM_SUM/g.CASM_COUNT : null;
+      const avg_rasm = g.RASM_COUNT ? g.RASM_SUM/g.RASM_COUNT : null;
+
+      return {
+        YEAR: y,
+        ASM: g.ASM || null,
+        RPM: g.RPM || null,
+        LOAD_FACTOR: load_factor,
+        YIELD: avg_yield,
+        CASM: avg_casm,
+        RASM: avg_rasm,
+        FUEL_FLY_OPS: g.FUEL_FLY_OPS || null,
+        OP_REVENUES: g.OP_REVENUES || null,
+        OP_EXPENSES: g.OP_EXPENSES || null
+      };
+    });
+  }, [airlineData]);
+
+  // Merge yearly metrics with yearly stock price by YEAR
+  const mergedData = useMemo(() => {
+    const stockMap = {};
+    yearlyStockData.forEach(s => { stockMap[s.YEAR] = s.stockPrice; });
+
+    return yearlyMetrics
+      .map(m => ({
+        YEAR: m.YEAR,
+        stockPrice: stockMap[m.YEAR] || null,
+        ASM: m.ASM,
+        RPM: m.RPM,
+        LOAD_FACTOR: m.LOAD_FACTOR,
+        YIELD: m.YIELD,
+        CASM: m.CASM,
+        RASM: m.RASM,
+        FUEL_FLY_OPS: m.FUEL_FLY_OPS,
+        OP_REVENUES: m.OP_REVENUES,
+        OP_EXPENSES: m.OP_EXPENSES
+      }))
+      .filter(d => d.stockPrice !== null); // ensure we have stock data
+  }, [yearlyStockData, yearlyMetrics]);
+
+  // Compute correlation for each metric with stockPrice
+  const correlationMetrics = ['ASM','RPM','LOAD_FACTOR','YIELD','CASM','RASM','FUEL_FLY_OPS','OP_REVENUES','OP_EXPENSES'];
+
+  const correlations = useMemo(() => {
+    if (mergedData.length < 2) return [];
+
+    const stockArray = mergedData.map(d => d.stockPrice);
+    return correlationMetrics.map(metric => {
+      const metricArray = mergedData.map(d => d[metric]);
+      // Filter out if we have nulls
+      if (metricArray.some(v => v == null)) {
+        return {metric, correlation: null};
+      } else {
+        const corr = pearsonCorrelation(stockArray, metricArray);
+        return {metric, correlation: corr};
+      }
+    });
+  }, [mergedData]);
+
+  // Prepare data for heatmap: For a single column (StockPrice vs Metric)
+  // Heatmap expects data as { x: 'Stock Price', y: metricName, value: correlationValue }
+  const heatmapData = correlations.map(c => ({
+    x: 'Stock Price',
+    y: c.metric,
+    value: c.correlation === null ? 0 : c.correlation
+  }));
+
+  const heatmapConfig = {
+    data: heatmapData,
+    xField: 'x',
+    yField: 'y',
+    colorField: 'value',
+    // correlation range: -1 to 1
+    color: ['#d73027','#f46d43','#fdae61','#fee08b','#d9ef8b','#a6d96a','#66bd63','#1a9850'],
+    meta: {
+      value: {
+        alias: 'Correlation',
+        formatter: (v) => v === null ? 'N/A' : v.toFixed(2)
+      }
+    },
+    tooltip: {
+      customItems: (items) => {
+        return items.map(item => ({
+          name: 'Correlation',
+          value: item.data.value === null ? 'N/A' : item.data.value.toFixed(2)
+        }));
+      }
+    },
+    legend: {
+      position: 'bottom'
+    },
+    height: 400,
+    xAxis: {
+      title: {
+        text: '',
+      },
+    },
+    yAxis: {
+      title: {
+        text: '',
+      },
+    },
+  };
+
+  const getAvailableYears = () => {
+    const yearsSet = new Set(airlineData.map(d => d.YEAR));
+    balanceSheets.forEach(d => yearsSet.add(d.YEAR));
+    return Array.from(yearsSet).filter(Boolean).sort((a, b) => a - b);
+  };
+
+  const getAvailableQuarters = () => {
+    return [1, 2, 3, 4];
+  };
 
   return (
     <div style={{ marginTop: '20px' }}>
@@ -176,8 +365,19 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
         </Row>
       </div>
 
-      {/* Tabbed charts */}
+      {/* Existing Charts */}
       <FinancialBalanceSheetCharts airlineData={filteredAirlineData} balanceSheets={filteredBalanceSheets} />
+
+      {/* Correlation Section */}
+      <div style={{ marginTop: '24px' }}>
+        <Card className="custom-card" title="Correlation with Stock Price">
+          {mergedData.length < 2 ? (
+            <p>Not enough data points to compute correlation.</p>
+          ) : (
+            <Heatmap {...heatmapConfig} />
+          )}
+        </Card>
+      </div>
     </div>
   );
 };
