@@ -292,10 +292,16 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     angleField: 'value',
     colorField: 'category',
     radius:0.9,
-    label:{ type:'outer', formatter: (item) => `${item.category}: ${formatNumber(item.value)}` },
-    tooltip:{ formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })},
-    height:300,
-    interactions:[{ type:'element-active' }],
+    scale: { color: { palette: 'Set2' } },
+    label: {
+        text: (d) => `${d.type}\n ${d.value}`,
+        position: 'spider',
+        valueFormatter: formatNumber,
+        labelFormatter: formatNumber
+      },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    height:400,
+
   }), [assetsData]);
 
   const liabPieChartConfig = useMemo(() => ({
@@ -303,10 +309,15 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     angleField: 'value',
     colorField: 'category',
     radius:0.9,
-    label:{ type:'outer', formatter: (item) => `${item.category}: ${formatNumber(item.value)}` },
-    tooltip:{ formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })},
-    height:300,
-    interactions:[{ type:'element-active' }],
+    scale: { color: { palette: 'Set2' } },
+    label: {
+        text: (d) => `${d.type}\n ${d.value}`,
+        position: 'spider',
+        valueFormatter: formatNumber,
+        labelFormatter: formatNumber
+      },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    height:400,
   }), [liabData]);
 
   const equityPieChartConfig = useMemo(() => ({
@@ -314,10 +325,15 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     angleField: 'value',
     colorField: 'category',
     radius:0.9,
-    label:{ type:'outer', formatter: (item) => `${item.category}: ${formatNumber(item.value)}` },
-    tooltip:{ formatter: (item) => ({ name: item.category, value: formatNumber(item.value) })},
-    height:300,
-    interactions:[{ type:'element-active' }],
+    scale: { color: { palette: 'Set2' } },
+    label: {
+        text: (d) => `${d.type}\n ${d.value}`,
+        position: 'spider',
+        valueFormatter: formatNumber,
+        labelFormatter: formatNumber
+      },
+    tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    height:400,
   }), [equityData]);
 
   const assetsLiabChartConfig = useMemo(() => ({
@@ -379,25 +395,27 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
       ),
     },
     {
-      key: '3',
-      label: 'Balance Sheet Composition',
-      children: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div>
-            <h4>Assets Composition</h4>
-            <Pie {...assetsPieChartConfig} />
+        key: '3',
+        label: 'Balance Sheet Composition',
+        children: (
+          <div style={{ display: 'flex', gap: '24px', justifyContent: 'space-between' }}>
+            <div style={{ flex: '1' }}>
+              <h4>Assets Composition</h4>
+              <Pie {...assetsPieChartConfig} />
+            </div>
+      
+            <div style={{ flex: '1' }}>
+              <h4>Liabilities Composition</h4>
+              <Pie {...liabPieChartConfig} />
+            </div>
+      
+            <div style={{ flex: '1' }}>
+              <h4>Equity Composition</h4>
+              <Pie {...equityPieChartConfig} />
+            </div>
           </div>
-          <div>
-            <h4>Liabilities Composition</h4>
-            <Pie {...liabPieChartConfig} />
-          </div>
-          <div>
-            <h4>Equity Composition</h4>
-            <Pie {...equityPieChartConfig} />
-          </div>
-        </div>
-      ),
-    },
+        ),
+      },      
     {
       key: '4',
       label: 'Assets vs Liab+Equity / Operating Profit/Loss',
