@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Statistic, Select } from 'antd';
 import { formatNumber } from '../../../utils/formatNumber';
+import FinancialBalanceSheetCharts from '../charts/FinancialBalanceSheetCharts'; // Import the charts
 
 const { Option } = Select;
 
@@ -28,12 +29,11 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
   }, [airlineData, selectedYear, selectedQuarter]);
 
   const filteredBalanceSheets = useMemo(() => {
-    const bs = balanceSheets.filter(item => {
+    return balanceSheets.filter(item => {
       const yearMatch = selectedYear === 'All' || item.YEAR === Number(selectedYear);
       const quarterMatch = selectedQuarter === 'All' || item.QUARTER === Number(selectedQuarter);
       return yearMatch && quarterMatch;
     });
-    return bs;
   }, [balanceSheets, selectedYear, selectedQuarter]);
 
   // Aggregate AirlineData metrics
@@ -59,7 +59,7 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
   // Debt-to-Equity Ratio: (LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET
   let debtToEquity = 'N/A';
   if (LIAB_SH_HLD_EQUITY && SH_HLD_EQUIT_NET && SH_HLD_EQUIT_NET !== 0) {
-    debtToEquity = ( (LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET );
+    debtToEquity = ((LIAB_SH_HLD_EQUITY - SH_HLD_EQUIT_NET) / SH_HLD_EQUIT_NET);
   }
 
   // ROA = NET_INCOME / ASSETS
@@ -180,6 +180,14 @@ const FinancialBalanceSheetTab = ({ airlineData, balanceSheets }) => {
           </Col>
         </Row>
       </div>
+
+      {/* Insert the Financial Charts */}
+      <FinancialBalanceSheetCharts
+        airlineData={airlineData}
+        balanceSheets={balanceSheets}
+        selectedYear={selectedYear}
+        selectedQuarter={selectedQuarter}
+      />
     </div>
   );
 };
