@@ -155,47 +155,49 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
   }, [stockYearlyData, selectedMetricData, selectedMetric]);
 
   const correlationChartConfig = useMemo(() => ({
-    data: [intersectionData, intersectionData],
+    data: intersectionData,
     xField: 'YEAR',
-    yField: ['stockPrice', 'value'],
     height: 400,
-    geometryOptions: [
+    scale: { y: { nice: false } },
+    children: [
       {
-        geometry: 'line',
-        smooth: true,
-        color: 'black',
-        lineStyle: { lineWidth: 3 },
+        // Stock price line
+        type: 'line',
+        yField:'stockPrice',
+        style: {
+          stroke: 'black',
+          shape:'smooth',
+          lineWidth: 3,
+        },
+        axis:{
+          y:{
+            title:'Stock Price ($)',
+            style:{titleFill:'black'},
+            labelFormatter: formatNumber,
+          },
+        },
       },
       {
-        geometry: 'line',
-        smooth: true,
-        seriesField: 'metric',
-        lineStyle: { lineWidth: 2 },
+        // Metrics lines
+        type:'line',
+        yField:'value',
+        seriesField:'metric',
+        style:{
+          lineWidth:2,
+          shape:'smooth',
+        },
+        axis:{
+          y:{
+            position:'right',
+            title:'Metric Value',
+            style:{titleFill:'#4DBBD5'},
+            labelFormatter: formatNumber,
+          },
+        },
       },
     ],
-    meta: {
-      stockPrice: {
-        alias: 'Stock Price ($)',
-        formatter: formatNumber,
-      },
-      value: {
-        alias: 'Metric Value',
-        formatter: formatNumber,
-      }
-    },
-    yAxis: {
-      stockPrice: {
-        title: { text: 'Stock Price ($)' },
-        label: { formatter: formatNumber },
-      },
-      value: {
-        title: { text: selectedMetric === 'LOAD_FACTOR' ? 'Load Factor (%)' : 'Metric Value' },
-        label: { formatter: formatNumber },
-      }
-    },
     tooltip: {
-      shared: true,
-      showCrosshairs: true,
+      items: [{ channel: 'y', valueFormatter: formatNumber}],
     },
   }), [intersectionData, selectedMetric]);
 
