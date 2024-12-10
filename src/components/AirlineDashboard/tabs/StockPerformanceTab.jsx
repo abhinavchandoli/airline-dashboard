@@ -235,7 +235,14 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
                     }
                   }}
                 >
-                  <Statistic title={`${kpi.nasdaqName} (${kpi.ticker})`} value={`$${kpi.latestPrice?.toFixed(2) || 'N/A'}`} />
+                      <Statistic
+                        title={
+                          <span style={{ fontSize: '10px', fontWeight: 'bold' }}>
+                            {`${kpi.nasdaqName} (${kpi.ticker})`}
+                          </span>
+                        }
+                        value={`$${kpi.latestPrice ? kpi.latestPrice.toFixed(2) : 'N/A'}`}
+                      />
                   <Statistic
                     title="1-Year Return"
                     value={formatReturn(kpi.oneYearReturn)}
