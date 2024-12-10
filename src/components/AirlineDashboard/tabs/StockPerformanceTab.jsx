@@ -1,3 +1,5 @@
+// src/components/AirlineDashboard/tabs/StockPerformanceTab.jsx
+
 import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Statistic, Segmented } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
@@ -6,6 +8,7 @@ import { Area, Column, Line } from '@ant-design/plots';
 import { formatNumber } from '../../../utils/formatNumber';
 import { formatReturn, getStockChartData, getSeasonalData } from '../charts/stockChartHelpers';
 import '../../AirlineDashboard.css';
+import airlines from '../../../data/airlines'; // Import airlines data to access forecast images
 
 const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, stockKPIs, navigate }) => {
   const [stockViewRange, setStockViewRange] = useState('Max');
@@ -13,25 +16,29 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
   const stockChartData = useMemo(() => getStockChartData(stockData, stockViewRange), [stockData, stockViewRange]);
   const { seasonalChartData, years } = useMemo(() => getSeasonalData(stockData), [stockData]);
 
+  // Retrieve the current airline's forecast image path
+  const currentAirline = airlines.find((airline) => airline.id === airlineId);
+  const forecastImagePath = currentAirline ? `/${currentAirline.id}-forecast.png` : null;
+
   const stockPriceAreaConfig = {
     data: stockChartData,
     xField: 'date',
     yField: 'price',
     smooth: true,
     axis: {
-        x: {
-          title: 'Date',
-          labelSpacing: 6,
-          style: { labelTransform: 'rotate(90)' },
-        },
-        y: {
-          title: 'Price',
-        },
+      x: {
+        title: 'Date',
+        labelSpacing: 6,
+        style: { labelTransform: 'rotate(90deg)' }, // Corrected to 'rotate(90deg)'
       },
-      style: {
-        fill: 'linear-gradient(-90deg, #41b6c4 0%, #225ea8 100%)',
+      y: {
+        title: 'Price',
       },
-      height: 400,
+    },
+    style: {
+      fill: 'linear-gradient(-90deg, #41b6c4 0%, #225ea8 100%)',
+    },
+    height: 400,
   };
 
   const volumeBarData = stockChartData.map((item, index) => {
@@ -113,6 +120,11 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
         strokeWidth: 1,
       },
     },
+  };
+
+  // Handler for view switch
+  const handleViewChange = (value) => {
+    setStockViewRange(value);
   };
 
   return (
@@ -204,21 +216,35 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
         </Row>
         <div style={{ marginTop: '24px' }}>
           <Segmented
-            options={['1Y', '3Y', '5Y', 'Max']}
+            options={['1Y', '3Y', '5Y', 'Max', 'Forecast']} // Added 'Forecast' option
             value={stockViewRange}
-            onChange={setStockViewRange}
+            onChange={handleViewChange}
           />
         </div>
         <div style={{ marginTop: '24px' }}>
-          <Area {...stockPriceAreaConfig} />
-        </div>
-        <div style={{ marginTop: '24px' }}>
-          <Column {...volumeBarChartConfig} />
-        </div>
-        <div style={{ marginTop: '24px' }}>
-          <Card title="Seasonals" className="custom-card">
-            <Line {...seasonalsChartConfig} />
-          </Card>
+          {stockViewRange !== 'Forecast' ? (
+            // Render charts for other options
+            <>
+              <Area {...stockPriceAreaConfig} />
+              <Column {...volumeBarChartConfig} />
+              <Card title="Seasonals" className="custom-card">
+                <Line {...seasonalsChartConfig} />
+              </Card>
+            </>
+          ) : (
+            // Render forecast image when 'Forecast' is selected
+            forecastImagePath ? (
+              <div style={{ textAlign: 'center' }}>
+                <img
+                  src={forecastImagePath}
+                  alt={`${airlineInfo?.nasdaqName} Forecast`}
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                />
+              </div>
+            ) : (
+              <p>Forecast image not available.</p>
+            )
+          )}
         </div>
         <div style={{ marginTop: '28px' }}>
           <h4 style={{ marginBottom: '24px' }}>Peer Comparison</h4>
@@ -235,14 +261,14 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
                     }
                   }}
                 >
-                      <Statistic
-                        title={
-                          <span style={{ fontSize: '10px', fontWeight: 'bold' }}>
-                            {`${kpi.nasdaqName} (${kpi.ticker})`}
-                          </span>
-                        }
-                        value={`$${kpi.latestPrice ? kpi.latestPrice.toFixed(2) : 'N/A'}`}
-                      />
+                  <Statistic
+                    title={
+                      <span style={{ fontSize: '10px', fontWeight: 'bold' }}>
+                        {`${kpi.nasdaqName} (${kpi.ticker})`}
+                      </span>
+                    }
+                    value={`$${kpi.latestPrice ? kpi.latestPrice.toFixed(2) : 'N/A'}`}
+                  />
                   <Statistic
                     title="1-Year Return"
                     value={formatReturn(kpi.oneYearReturn)}
