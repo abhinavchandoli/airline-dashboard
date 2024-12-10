@@ -1,7 +1,7 @@
 // AboutPage.js
 import React from 'react';
 import { List, Typography, Space, Divider } from 'antd';
-import { LinkedinFilled } from '@ant-design/icons';
+import { LinkedinFilled, GithubOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -11,16 +11,17 @@ const teamMembers = [
     name: 'Abhinav Chandoli',
     role: 'Data Analysis, Data Visualization, Frontend Web Development',
     linkedin: 'https://www.linkedin.com/in/abhinav-chandoli-03',
+    github: 'https://github.com/abhinavchandoli',
   },
   {
     name: 'Sai Krishna Nalla',
     role: 'Data Analysis, Backend Development, Machine Learning',
-    linkedin: 'https://www.linkedin.com/in/bob-smith',
+    linkedin: 'www.linkedin.com/in/sai-krishna-nalla-361289190',
   },
   {
     name: 'Prudhviraj Sakile',
     role: 'Data Preprocessing, Database Management',
-    linkedin: 'https://www.linkedin.com/in/carol-white',
+    linkedin: 'https://www.linkedin.com/in/prudhvi-raj-22ba27217',
   },
   {
     name: 'Pranay Reddy Ala',
@@ -30,7 +31,7 @@ const teamMembers = [
   {
     name: 'Kiran Kumar Reddy Yerrabathini',
     role: 'Scrum Master, Planning and Executing Sprints',
-    linkedin: 'https://www.linkedin.com/in/eva-green',
+    linkedin: 'https://www.linkedin.com/in/kiran-kumar-reddy-yerrabathini-ba9088239/',
   },
 ];
 
@@ -104,6 +105,16 @@ const AboutPage = () => {
                   aria-label={`${member.name}'s LinkedIn`}
                 >
                   <LinkedinFilled style={{ fontSize: '24px', color: '#0e76a8' }} />
+                </a>
+              )}
+                {member.github && (
+                <a
+                  href={member.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${member.name}'s GitHub`}
+                >
+                  <GithubOutlined style={{ fontSize: '24px', color: '#333' }} />
                 </a>
               )}
             </Space>
