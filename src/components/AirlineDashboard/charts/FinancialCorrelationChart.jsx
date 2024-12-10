@@ -197,7 +197,9 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
       },
     ],
     tooltip: {
-      items: [{ channel: 'y', valueFormatter: formatNumber}],
+      items: [{ channel: 'y', 
+        valueFormatter: formatNumber,
+        valueFormatter:'.2f'}],
     },
   }), [intersectionData, selectedMetric]);
 
