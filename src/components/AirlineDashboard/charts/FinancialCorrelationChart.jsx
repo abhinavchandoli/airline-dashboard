@@ -197,9 +197,16 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
       },
     ],
     tooltip: {
-      items: [{ channel: 'y', 
-        valueFormatter: formatNumber,
-        valueFormatter:'.2f'}],
+      items: [{ 
+        channel: 'y', 
+        valueFormatter: (value) => {
+          // First, apply custom formatting
+          const customFormatted = formatNumber(value);
+          
+          // Then, apply decimal precision
+          return d3.format('.2f')(customFormatted);
+        }
+      }],
     },
   }), [intersectionData, selectedMetric]);
 
