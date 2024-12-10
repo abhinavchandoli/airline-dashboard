@@ -203,7 +203,7 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
   }), [intersectionData, selectedMetric]);
 
   return (
-    <Card title="Correlation with Stock Price" style={{ marginTop: '24px' }}>
+    <Card className="custom-card" title="Correlation with Stock Price" style={{ marginTop: '24px' }}>
       <div style={{ marginBottom: '16px' }}>
         <Select
           style={{ width: 300 }}
