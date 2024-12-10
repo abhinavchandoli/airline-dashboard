@@ -77,8 +77,9 @@ function aggregateYieldByYear(data) {
 }
 
 export default function FinancialCorrelationChart({ airlineData, operatingData, stockData }) {
-  const [selectedMetrics, setSelectedMetrics] = useState(['ASM']); // Default selection is ASM
+  const [selectedMetric, setSelectedMetric] = useState('ASM'); // default is ASM
 
+  // Aggregate data for all metrics
   const asmData = useMemo(() => aggregateDataByYear(airlineData, 'ASM'), [airlineData]);
   const rpmData = useMemo(() => aggregateDataByYear(airlineData, 'RPM'), [airlineData]);
 
@@ -122,92 +123,90 @@ export default function FinancialCorrelationChart({ airlineData, operatingData, 
     ...fuelData,
   ],[asmData,rpmData,lfData,yieldData,casmData,rasmData,prasmData,opRevData,opExpData,trpData,fuelData]);
 
-  const filteredMetricsData = useMemo(()=> {
-    return allMetricsData.filter(d=>selectedMetrics.includes(d.metric));
-  }, [allMetricsData, selectedMetrics]);
+  // Filter data to only the selected metric
+  const selectedMetricData = useMemo(() => {
+    return allMetricsData.filter(d => d.metric === selectedMetric);
+  }, [allMetricsData, selectedMetric]);
 
-  // Merge stock and metric data into a single dataset
-  const mergedData = useMemo(()=>{
-    const yearSet = new Set();
-    stockYearlyData.forEach(d=>yearSet.add(d.YEAR));
-    filteredMetricsData.forEach(d=>yearSet.add(d.YEAR));
+  // Find intersection of years: we only plot years present in both stock data and metric data
+  const intersectionData = useMemo(() => {
+    const stockYears = new Set(stockYearlyData.map(d => d.YEAR));
+    const metricYears = new Set(selectedMetricData.map(d => d.YEAR));
 
+    // intersection of both sets
+    const intersectYears = [...stockYears].filter(y => metricYears.has(y));
+
+    // For intersection years, build final array with both stockPrice and metric value
     const finalArr = [];
-    // Add stock data rows
-    stockYearlyData.forEach(d => {
+    // We'll find the corresponding stockPrice for that year
+    // and the corresponding metric value
+    intersectYears.forEach(year => {
+      const stockEntry = stockYearlyData.find(s => s.YEAR === year);
+      const metricEntry = selectedMetricData.find(m => m.YEAR === year);
       finalArr.push({
-        YEAR: d.YEAR,
-        stockPrice: d.stockPrice,
+        YEAR: year,
+        stockPrice: stockEntry ? stockEntry.stockPrice : null,
+        value: metricEntry ? metricEntry.value : null,
+        metric: selectedMetric
       });
     });
-    // Add metrics data rows
-    filteredMetricsData.forEach(d => {
-      finalArr.push({
-        YEAR: d.YEAR,
-        metric: d.metric,
-        value: d.value,
-      });
-    });
-    return finalArr.sort((a,b)=>Number(a.YEAR)-Number(b.YEAR));
-  },[stockYearlyData, filteredMetricsData]);
 
-  const correlationChartConfig = useMemo(()=>({
-    data: mergedData,
+    return finalArr.sort((a,b) => Number(a.YEAR)-Number(b.YEAR));
+  }, [stockYearlyData, selectedMetricData, selectedMetric]);
+
+  const correlationChartConfig = useMemo(() => ({
+    data: [intersectionData, intersectionData],
     xField: 'YEAR',
+    yField: ['stockPrice', 'value'],
     height: 400,
-    scale: { y: { nice: false } },
-    children: [
+    geometryOptions: [
       {
-        // Stock price line
-        type: 'line',
-        yField:'stockPrice',
-        style: {
-          stroke: 'black',
-          shape:'smooth',
-          lineWidth: 3,
-        },
-        axis:{
-          y:{
-            title:'Stock Price ($)',
-            style:{titleFill:'black'},
-            labelFormatter: formatNumber,
-          },
-        },
+        geometry: 'line',
+        smooth: true,
+        color: 'black',
+        lineStyle: { lineWidth: 3 },
       },
       {
-        // Metrics lines
-        type:'line',
-        yField:'value',
-        seriesField:'metric',
-        style:{
-          lineWidth:2,
-          shape:'smooth',
-        },
-        axis:{
-          y:{
-            position:'right',
-            title:'Metric Value',
-            style:{titleFill:'#4DBBD5'},
-            labelFormatter: formatNumber,
-          },
-        },
+        geometry: 'line',
+        smooth: true,
+        seriesField: 'metric',
+        lineStyle: { lineWidth: 2 },
       },
     ],
-    tooltip: {
-      items: [{ channel: 'y', valueFormatter: formatNumber}],
+    meta: {
+      stockPrice: {
+        alias: 'Stock Price ($)',
+        formatter: formatNumber,
+      },
+      value: {
+        alias: 'Metric Value',
+        formatter: formatNumber,
+      }
     },
-  }),[mergedData]);
+    yAxis: {
+      stockPrice: {
+        title: { text: 'Stock Price ($)' },
+        label: { formatter: formatNumber },
+      },
+      value: {
+        title: { text: selectedMetric === 'LOAD_FACTOR' ? 'Load Factor (%)' : 'Metric Value' },
+        label: { formatter: formatNumber },
+      }
+    },
+    tooltip: {
+      shared: true,
+      showCrosshairs: true,
+    },
+  }), [intersectionData, selectedMetric]);
 
   return (
     <Card title="Correlation with Stock Price" style={{ marginTop: '24px' }}>
       <div style={{ marginBottom: '16px' }}>
         <Select
-          mode="multiple"
-          allowClear
           style={{ width: 300 }}
-          placeholder="Select Metrics"
-          value={selectedMetrics}
-          onChange={(vals) => setSelectedMetrics(vals)}
+          placeholder="Select a Metric"
+          value={selectedMetric}
+          onChange={(val) => setSelectedMetric(val)}
         >
           {METRICS.map(m => <Option key={m.key} value={m.key}>{m.label}</Option>)}
         </Select>
