@@ -24,7 +24,6 @@ function computeAirlineYearlyMetrics(airlineData) {
     const totalNetIncome = rows.reduce((sum, r) => sum + (r.NET_INCOME || 0), 0);
     const totalOpProfitLoss = rows.reduce((sum, r) => sum + (r.OP_PROFIT_LOSS || 0), 0);
     const totalOpExpenses = rows.reduce((sum, r) => sum + (r.OP_EXPENSES || 0), 0);
-
     const operatingMargin = totalOpRevenues !== 0 ? (totalOpProfitLoss / totalOpRevenues) * 100 : null;
     const netProfitMargin = totalOpRevenues !== 0 ? (totalNetIncome / totalOpRevenues) * 100 : null;
 
