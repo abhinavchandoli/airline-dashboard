@@ -452,5 +452,4 @@ const FinancialBalanceSheetCharts = ({ airlineData, balanceSheets }) => {
     </Card>
   );
 };
-
 export default React.memo(FinancialBalanceSheetCharts);
