@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Typography } from 'antd';
-import './HomePage.css'; // Create a separate CSS file to handle the blinking animation
 
 const { Title, Paragraph } = Typography;
 
