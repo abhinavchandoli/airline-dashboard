@@ -1,6 +1,6 @@
 // src/App.js
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import HomePage from './components/Homepage';
@@ -13,7 +13,7 @@ import './App.css';
 const enforceDesktopMode = () => {
   const metaViewport = document.querySelector('meta[name="viewport"]');
   if (metaViewport) {
-    metaViewport.setAttribute('content', 'width=1280, initial-scale=1');
+      metaViewport.setAttribute('content', 'width=1280, initial-scale=1');
   }
 };
 
@@ -21,33 +21,9 @@ window.addEventListener('resize', enforceDesktopMode);
 window.addEventListener('load', enforceDesktopMode);
 
 function App() {
-  const [isDarkMode, setDarkMode] = useState(false);
-
-  // Optional: Persist theme in localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setDarkMode(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
-
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
-
   return (
     <Router>
-      <Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+      <Header />
       <div className="container mt-4">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -62,3 +38,5 @@ function App() {
 }
 
 export default App;
+
+
