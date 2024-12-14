@@ -30,11 +30,8 @@ const AirlineLogo = ({ airline }) => {
             height: '100%',
             width: '100%',
             objectFit: 'contain',
-            transition: 'transform 0.3s',
             willChange: 'transform',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         />
       </Link>
     </div>
@@ -43,7 +40,7 @@ const AirlineLogo = ({ airline }) => {
 
 const HomePage = () => {
   // Set the initial active airline to the first in the array
-  const [activeAirlineId, setActiveAirlineId] = useState(airlines[0].id);
+  const [activeAirlineId] = useState(airlines[0].id);
 
   return (
     <Container fluid className="text-center" style={{ paddingTop: '5rem' }}>
@@ -86,7 +83,6 @@ const HomePage = () => {
       >
         Analysis by Airline
       </h2>
-      <p>Hover over an airline logo to highlight it.</p>
 
       <Row className="justify-content-center" style={{ marginTop: '3rem' }}>
         {airlines.map((airline) => (
@@ -98,7 +94,6 @@ const HomePage = () => {
             key={airline.id}
             className={`mb-4 logo-col ${activeAirlineId === airline.id ? 'border-highlight' : ''}`}
             style={{ display: 'flex', justifyContent: 'center' }}
-            onMouseEnter={() => setActiveAirlineId(airline.id)}
           >
             <AirlineLogo airline={airline} />
           </Col>
