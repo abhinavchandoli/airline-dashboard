@@ -77,11 +77,11 @@ const HomePage = () => {
 
       <h2
         className="fw-bold"
-        style={{ color: '#005239', fontFamily: 'Figtree, sans-serif' }}
+        style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
       >
         Analysis by Airline
       </h2>
-      <p>Hover over an airline logo to highlight it. The border now blinks!</p>
+      <p>Click on an Airline to see in-depth analysis!</p>
 
       <Row className="justify-content-center" style={{ marginTop: '3rem' }}>
         {airlines.map((airline) => (

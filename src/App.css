@@ -104,7 +104,6 @@ body {
 .border-highlight {
   border: 2.5px solid #000000;
   border-radius: 8px;
-  padding: 10px;
   animation: blink-border 3s infinite;
 }
 
