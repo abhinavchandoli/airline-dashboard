@@ -111,3 +111,15 @@ body {
   border-color: #000000; /* Just change the border color */
   animation: blink-border 3s infinite;
 }
+
+@keyframes blink-border {
+  0% {
+    border-color: #000000;
+  }
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: #000000;
+  }
+}
