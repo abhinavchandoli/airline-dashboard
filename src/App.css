@@ -62,7 +62,7 @@ h1, h2, p {
 }
 
 .img-fluid:hover {
-  transform: scale(1.05);
+  transform: none;
 }
 
 /* Import Figtree font */
@@ -80,7 +80,7 @@ body {
 
 /* Hover effect for logos */
 .airline-logo:hover, .carrier-logo:hover {
-  transform: scale(1.05);
+  transform: none;
 }
 
 /* Navbar button styling */
@@ -103,7 +103,9 @@ body {
 
 .border-highlight {
   border: 2.5px solid #000000;
-  animation: blink-border 1s infinite;
+  border-radius: 8px;
+  padding: 10px;
+  animation: blink-border 3s infinite;
 }
 
 @keyframes blink-border {
