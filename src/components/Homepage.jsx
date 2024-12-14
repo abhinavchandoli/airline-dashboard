@@ -1,6 +1,4 @@
-// HomePage.js
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Typography } from 'antd';
@@ -44,13 +42,15 @@ const AirlineLogo = ({ airline }) => {
 };
 
 const HomePage = () => {
+  // Set the initial active airline to the first in the array
+  const [activeAirlineId, setActiveAirlineId] = useState(airlines[0].id);
+
   return (
     <Container fluid className="text-center" style={{ paddingTop: '5rem' }}>
-      {/* Main Title with Background Image */}
       <div
         className="main-title-section"
         style={{
-          backgroundImage: 'url(/daniel-shapiro-tpdQ8_h5Mzg-unsplash.jpg)', // Replace with the actual image path
+          backgroundImage: 'url(/daniel-shapiro-tpdQ8_h5Mzg-unsplash.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           padding: '5rem 2rem',
@@ -72,7 +72,6 @@ const HomePage = () => {
         </p>
       </div>
 
-      {/* Divider */}
       <hr
         style={{
           width: '50%',
@@ -81,15 +80,14 @@ const HomePage = () => {
         }}
       />
 
-      {/* Section Heading */}
       <h2
         className="fw-bold"
         style={{ color: '#005239', fontFamily: 'Figtree, sans-serif' }}
       >
         Analysis by Airline
       </h2>
+      <p>Hover over an airline logo to highlight it.</p>
 
-      {/* Airline Logos */}
       <Row className="justify-content-center" style={{ marginTop: '3rem' }}>
         {airlines.map((airline) => (
           <Col
@@ -98,8 +96,9 @@ const HomePage = () => {
             md={3}
             lg={2}
             key={airline.id}
-            className="mb-4"
+            className={`mb-4 logo-col ${activeAirlineId === airline.id ? 'border-highlight' : ''}`}
             style={{ display: 'flex', justifyContent: 'center' }}
+            onMouseEnter={() => setActiveAirlineId(airline.id)}
           >
             <AirlineLogo airline={airline} />
           </Col>

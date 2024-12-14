@@ -100,4 +100,13 @@ body {
   margin-bottom: 1rem;
 }
 
+.logo-col {
+  transition: border 0.3s ease;
+}
+
+.logo-col.border-highlight {
+  border: 2px solid #000000;
+  border-radius: 8px;
+  padding: 10px; /* optional to make the border stand out */
+}
 
