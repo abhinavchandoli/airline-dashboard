@@ -100,21 +100,14 @@ body {
   margin-bottom: 1rem;
 }
 
-
-.border-highlight {
-  border: 2.5px solid #000000;
+.logo-col {
+  border: 2.5px solid transparent; /* Set a default transparent border */
   border-radius: 8px;
-  animation: blink-border 3s infinite;
+  padding: 10px; /* Keep this consistent at all times */
+  box-sizing: border-box; /* Ensures border & padding don't change element size */
 }
 
-@keyframes blink-border {
-  0% {
-    border-color: #000000;
-  }
-  50% {
-    border-color: transparent;
-  }
-  100% {
-    border-color: #000000;
-  }
+.border-highlight {
+  border-color: #000000; /* Just change the border color */
+  animation: blink-border 3s infinite;
 }
