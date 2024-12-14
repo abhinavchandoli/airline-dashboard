@@ -100,13 +100,20 @@ body {
   margin-bottom: 1rem;
 }
 
-.logo-col {
-  transition: border 0.3s ease;
+
+.border-highlight {
+  border: 2.5px solid #000000;
+  animation: blink-border 1s infinite;
 }
 
-.logo-col.border-highlight {
-  border: 4px solid #000000;
-  border-radius: 8px;
-  padding: 10px; /* optional to make the border stand out */
+@keyframes blink-border {
+  0% {
+    border-color: #000000;
+  }
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: #000000;
+  }
 }
-
