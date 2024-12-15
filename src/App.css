@@ -1,191 +1,93 @@
-.App {
-  text-align: center;
-}
+/* App.css */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Center the header and add space around it */
-.header-wrapper {
-  max-width: 90%;          /* Limit header width */
-  margin: 2rem auto 0;     /* Center horizontally and add space at the top */
-  padding: 0 1rem;         /* Padding on the sides */
-}
-
+/* Base Styles */
 body {
-  background-color: #ffffff; /* Dark background */
+  background-color: #ffffff;
   color: #005239;
+  font-family: 'Figtree', sans-serif;
 }
 
 h1, h2, p {
   color: #005239;
 }
 
-.navbar {
-  background-color: #000000 !important;
+/* Header wrapper */
+.header-wrapper {
+  max-width: 90%;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
+}
+
+/* Main title section */
+.main-title-section {
+  background-image: url('/daniel-shapiro-tpdQ8_h5Mzg-unsplash.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 5rem 2rem;
+  text-align: left;
   border-radius: 15px;
+  margin-top: 5rem;
 }
 
-.nav-link {
-  color: #fff !important;
-  transition: color 0.2s;
+.main-title {
+  color: #000000;
 }
 
-.nav-link:hover {
-  color: #fff !important;
+.subtitle {
+  color: #000000;
 }
 
-.img-fluid {
-  max-height: 80px;
-  transition: transform 0.3s ease-in-out;
+/* Divider */
+.homepage-divider {
+  width: 50%;
+  margin: 2rem auto;
+  border-top: 3px solid #005239;
 }
 
-.img-fluid:hover {
-  transform: none;
+/* Analysis by Airline */
+.analysis-title {
+  color: #000000;
 }
 
-/* Import Figtree font */
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap');
-
-body {
-  font-family: 'Figtree', sans-serif;
+.analysis-subtitle {
+  margin-bottom: 2rem;
 }
 
-/* Rounded borders for logos */
-.airline-logo, .carrier-logo {
-  border-radius: 15px;
-  transition: transform 0.3s ease;
-}
-
-/* Hover effect for logos */
-.airline-logo:hover, .carrier-logo:hover {
-  transform: none;
-}
-
-/* Navbar button styling */
-.navbar .btn {
-  border-radius: 20px;
-}
-
-/* Section heading and list styling */
-.section-heading {
-  color: #005239;
-  font-weight: bold;
-}
-
-.carrier-type {
-  color: #005239;
-  font-weight: bold;
-  margin-bottom: 1rem;
+/* Airline logos */
+.airline-logos-row {
+  margin-top: 3rem;
 }
 
 .logo-col {
-  border: 2.5px solid transparent; /* Set a default transparent border */
+  display: flex;
+  justify-content: center;
+  border: 2.5px solid transparent;
   border-radius: 8px;
-  padding: 10px; /* Keep this consistent at all times */
-  box-sizing: border-box; /* Ensures border & padding don't change element size */
+  padding: 10px;
+  box-sizing: border-box;
 }
 
+/* Highlight animation */
 .border-highlight {
-  border-color: #000000; /* Just change the border color */
+  border-color: #000000;
   animation: blink-border 3s infinite;
 }
 
 @keyframes blink-border {
-  0% {
-    border-color: #000000;
-  }
-  50% {
-    border-color: transparent;
-  }
-  100% {
-    border-color: #000000;
-  }
+  0% { border-color: #000000; }
+  50% { border-color: transparent; }
+  100% { border-color: #000000; }
 }
 
-/* src/App.css */
-
-/* Global styles for mobile devices */
-@media (max-width: 576px) {
-  .header-wrapper {
-    margin: 1rem auto 0;
-    padding: 0 0.5rem;
-  }
-
-  .main-title-section h1.display-3 {
-    font-size: 1.75rem; /* Smaller title on mobile */
-  }
-
-  .main-title-section .lead {
-    font-size: 1rem;
-  }
-
-  /* Adjust padding on sections */
-  .main-title-section {
-    padding: 3rem 1rem;
-  }
-
-  /* Adjust card text for DataPage and ResourcesPage */
-  .ant-card p {
-    font-size: 0.9rem;
-  }
+/* Welcome section */
+.welcome-section {
+  margin-top: 2rem;
+  text-align: left;
 }
 
-/* Tablet adjustments */
-@media (min-width: 577px) and (max-width: 992px) {
-  .main-title-section h1.display-3 {
-    font-size: 2.5rem;
-  }
+/* Responsive Adjustments */
 
-  .main-title-section {
-    padding: 4rem 1.5rem;
-  }
-
-  /* Slightly adjust margin for rows of airline logos */
-  .logo-col {
-    margin-bottom: 2rem;
-  }
-}
-
-
-/* src/App.css or src/components/AboutPage.css */
-
-@media (max-width: 576px) {
-  .about-container {
-    padding: 12px; /* Less padding on small screens */
-  }
-
-  .about-container h1 {
-    font-size: 1.5rem;
-  }
-
-  .about-container p {
-    font-size: 0.9rem;
-  }
-}
-
-/* Global mobile-first adjustments */
+/* Mobile (max-width: 576px) */
 @media (max-width: 576px) {
   .main-title-section {
     padding: 3rem 1rem;
@@ -216,7 +118,6 @@ body {
     line-height: 1.6;
   }
 
-  /* Adjust spacing between airline logos */
   .airline-logos-row {
     margin-top: 1.5rem;
   }
@@ -226,6 +127,7 @@ body {
   }
 }
 
+/* Tablet (min-width: 577px and max-width: 992px) */
 @media (min-width: 577px) and (max-width: 992px) {
   .main-title {
     font-size: 2.5rem;

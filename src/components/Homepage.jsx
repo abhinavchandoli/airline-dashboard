@@ -18,74 +18,41 @@ const airlines = [
   { id: 'united-airlines', name: 'United Air Lines Inc.', logo: '/united-logo.png' },
 ];
 
-const AirlineLogo = ({ airline }) => {
-  return (
-    <div style={{ height: '80px', overflow: 'hidden' }}>
-      <Link to={`/airline/${airline.id}`}>
-        <img
-          src={airline.logo}
-          alt={airline.name}
-          className="img-fluid"
-          style={{
-            height: '100%',
-            width: '100%',
-            objectFit: 'contain',
-          }}
-        />
-      </Link>
-    </div>
-  );
-};
+
+const AirlineLogo = ({ airline }) => (
+  <div className="airline-logo-container">
+    <Link to={`/airline/${airline.id}`}>
+      <img
+        src={airline.logo}
+        alt={airline.name}
+        className="img-fluid airline-logo"
+      />
+    </Link>
+  </div>
+);
 
 const HomePage = () => {
   const [activeAirlineId, setActiveAirlineId] = useState(airlines[0].id);
 
   return (
     <Container fluid className="homepage-container text-center">
-      <div
-        className="main-title-section"
-        style={{
-          backgroundImage: 'url(/daniel-shapiro-tpdQ8_h5Mzg-unsplash.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          padding: '5rem 2rem',
-          textAlign: 'left',
-          borderRadius: '15px',
-          marginTop: '5rem',
-        }}
-      >
-        <h1
-          className="display-3 fw-bold main-title"
-          style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
-        >
+      <div className="main-title-section">
+        <h1 className="display-3 fw-bold main-title">
           Airline Financial Economics
         </h1>
-        <p
-          className="lead subtitle"
-          style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
-        >
+        <p className="lead subtitle">
           Discover insights across major airlines and unlock data-driven strategies.
         </p>
       </div>
 
-      <hr
-        className="homepage-divider"
-        style={{
-          width: '50%',
-          margin: '2rem auto',
-          borderTop: '3px solid #005239',
-        }}
-      />
+      <hr className="homepage-divider" />
 
-      <h2
-        className="fw-bold analysis-title"
-        style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
-      >
+      <h2 className="fw-bold analysis-title">
         Analysis by Airline
       </h2>
       <p className="analysis-subtitle">Click on an Airline to see in-depth analysis!</p>
 
-      <Row className="justify-content-center airline-logos-row" style={{ marginTop: '3rem' }}>
+      <Row className="justify-content-center airline-logos-row">
         {airlines.map((airline) => (
           <Col
             xs={6}
@@ -94,7 +61,6 @@ const HomePage = () => {
             lg={2}
             key={airline.id}
             className={`mb-4 logo-col ${activeAirlineId === airline.id ? 'border-highlight' : ''}`}
-            style={{ display: 'flex', justifyContent: 'center' }}
             onMouseEnter={() => setActiveAirlineId(airline.id)}
           >
             <AirlineLogo airline={airline} />
@@ -102,10 +68,8 @@ const HomePage = () => {
         ))}
       </Row>
 
-      {/* Welcome Section */}
-      <div className="welcome-section" style={{ marginTop: '2rem', textAlign: 'left' }}>
-        <Title level={2} style={{ color: '#005239', fontFamily: 'Figtree, sans-serif' }}>
-          Welcome to Airline Financial Economics Dashboard
+      <div className="welcome-section">
+        <Title level={2}>          Welcome to Airline Financial Economics Dashboard
         </Title>
         <Paragraph style={{ fontSize: '1.1rem', lineHeight: '1.8' }}>
           The U.S. airline industry is a vital component of the nation's economy, connecting people
