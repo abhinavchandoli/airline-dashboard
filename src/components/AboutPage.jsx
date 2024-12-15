@@ -9,7 +9,7 @@ const { Title, Paragraph, Text } = Typography;
 const teamMembers = [
   {
     name: 'Abhinav Chandoli',
-    role: 'Data Analysis, Data Visualization, Frontend Web Development, Backend Development',
+    role: 'Data Analysis, Data Visualization, Frontend Web Development, Machine Learning',
     linkedin: 'https://www.linkedin.com/in/abhinav-chandoli-03',
     github: 'https://github.com/abhinavchandoli',
   },
