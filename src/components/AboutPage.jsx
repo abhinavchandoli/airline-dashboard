@@ -57,7 +57,7 @@ const clients = [
 
 const AboutPage = () => {
   return (
-    <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="about-container" style={{ padding: '24px' }}>
       {/* Introduction Section */}
       <Typography>
         <Title level={2}>About Our Dashboard</Title>

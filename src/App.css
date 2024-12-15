@@ -123,3 +123,119 @@ body {
     border-color: #000000;
   }
 }
+
+/* src/App.css */
+
+/* Global styles for mobile devices */
+@media (max-width: 576px) {
+  .header-wrapper {
+    margin: 1rem auto 0;
+    padding: 0 0.5rem;
+  }
+
+  .main-title-section h1.display-3 {
+    font-size: 1.75rem; /* Smaller title on mobile */
+  }
+
+  .main-title-section .lead {
+    font-size: 1rem;
+  }
+
+  /* Adjust padding on sections */
+  .main-title-section {
+    padding: 3rem 1rem;
+  }
+
+  /* Adjust card text for DataPage and ResourcesPage */
+  .ant-card p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 577px) and (max-width: 992px) {
+  .main-title-section h1.display-3 {
+    font-size: 2.5rem;
+  }
+
+  .main-title-section {
+    padding: 4rem 1.5rem;
+  }
+
+  /* Slightly adjust margin for rows of airline logos */
+  .logo-col {
+    margin-bottom: 2rem;
+  }
+}
+
+
+/* src/App.css or src/components/AboutPage.css */
+
+@media (max-width: 576px) {
+  .about-container {
+    padding: 12px; /* Less padding on small screens */
+  }
+
+  .about-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .about-container p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Global mobile-first adjustments */
+@media (max-width: 576px) {
+  .main-title-section {
+    padding: 3rem 1rem;
+  }
+
+  .main-title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .homepage-divider {
+    width: 75%;
+  }
+
+  .analysis-title {
+    font-size: 1.5rem;
+  }
+
+  .analysis-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .welcome-section p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Adjust spacing between airline logos */
+  .airline-logos-row {
+    margin-top: 1.5rem;
+  }
+
+  .logo-col {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+
+  .main-title-section {
+    padding: 4rem 1.5rem;
+  }
+
+  .logo-col {
+    margin-bottom: 2rem;
+  }
+}

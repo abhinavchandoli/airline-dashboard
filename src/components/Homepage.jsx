@@ -41,7 +41,7 @@ const HomePage = () => {
   const [activeAirlineId, setActiveAirlineId] = useState(airlines[0].id);
 
   return (
-    <Container fluid className="text-center" style={{ paddingTop: '5rem' }}>
+    <Container fluid className="homepage-container text-center">
       <div
         className="main-title-section"
         style={{
@@ -51,16 +51,17 @@ const HomePage = () => {
           padding: '5rem 2rem',
           textAlign: 'left',
           borderRadius: '15px',
+          marginTop: '5rem',
         }}
       >
         <h1
-          className="display-3 fw-bold"
+          className="display-3 fw-bold main-title"
           style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
         >
           Airline Financial Economics
         </h1>
         <p
-          className="lead"
+          className="lead subtitle"
           style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
         >
           Discover insights across major airlines and unlock data-driven strategies.
@@ -68,6 +69,7 @@ const HomePage = () => {
       </div>
 
       <hr
+        className="homepage-divider"
         style={{
           width: '50%',
           margin: '2rem auto',
@@ -76,14 +78,14 @@ const HomePage = () => {
       />
 
       <h2
-        className="fw-bold"
+        className="fw-bold analysis-title"
         style={{ color: '#000000', fontFamily: 'Figtree, sans-serif' }}
       >
         Analysis by Airline
       </h2>
-      <p>Click on an Airline to see in-depth analysis!</p>
+      <p className="analysis-subtitle">Click on an Airline to see in-depth analysis!</p>
 
-      <Row className="justify-content-center" style={{ marginTop: '3rem' }}>
+      <Row className="justify-content-center airline-logos-row" style={{ marginTop: '3rem' }}>
         {airlines.map((airline) => (
           <Col
             xs={6}
@@ -101,7 +103,7 @@ const HomePage = () => {
       </Row>
 
       {/* Welcome Section */}
-      <div style={{ marginTop: '2rem', textAlign: 'left' }}>
+      <div className="welcome-section" style={{ marginTop: '2rem', textAlign: 'left' }}>
         <Title level={2} style={{ color: '#005239', fontFamily: 'Figtree, sans-serif' }}>
           Welcome to Airline Financial Economics Dashboard
         </Title>

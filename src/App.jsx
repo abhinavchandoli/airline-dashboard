@@ -10,15 +10,16 @@ import ResourcesPage from './components/ResourcesPage';
 import AboutPage from './components/AboutPage';
 import './App.css';
 
-const enforceDesktopMode = () => {
-  const metaViewport = document.querySelector('meta[name="viewport"]');
-  if (metaViewport) {
-      metaViewport.setAttribute('content', 'width=1280, initial-scale=1');
-  }
-};
+// REMOVE OR COMMENT OUT THIS CODE
+// const enforceDesktopMode = () => {
+//   const metaViewport = document.querySelector('meta[name="viewport"]');
+//   if (metaViewport) {
+//       metaViewport.setAttribute('content', 'width=1280, initial-scale=1');
+//   }
+// };
 
-window.addEventListener('resize', enforceDesktopMode);
-window.addEventListener('load', enforceDesktopMode);
+// window.addEventListener('resize', enforceDesktopMode);
+// window.addEventListener('load', enforceDesktopMode);
 
 function App() {
   return (
