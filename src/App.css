@@ -141,3 +141,10 @@ h1, h2, p {
     margin-bottom: 2rem;
   }
 }
+
+.nav-link.active {
+  border: 2px solid #ffffff;
+  color: #ffffff !important;
+  border-radius: 5px;
+  background-color: transparent;
+}
