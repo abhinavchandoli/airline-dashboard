@@ -142,3 +142,10 @@ h1, h2, p {
   }
 }
 
+.image-credit {
+  font-size: 0.8rem;     /* Small font size */
+  font-style: italic;    /* Italicized text */
+  text-align: right;     /* Right-aligned */
+  color: #555;           /* Subtle color to differentiate from main text */
+  margin-top: 1rem;      /* Small spacing from the subtitle */
+}

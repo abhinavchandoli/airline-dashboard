@@ -18,7 +18,6 @@ const airlines = [
   { id: 'united-airlines', name: 'United Air Lines Inc.', logo: '/united-logo.png' },
 ];
 
-
 const AirlineLogo = ({ airline }) => {
   return (
     <div style={{ height: '80px', overflow: 'hidden' }}>
@@ -44,19 +43,35 @@ const HomePage = () => {
   return (
     <Container fluid className="homepage-container text-center">
       <div className="main-title-section">
-        <h1 className="display-3 fw-bold main-title">
-          Airline Financial Economics
-        </h1>
+        <h1 className="display-3 fw-bold main-title">Airline Financial Economics</h1>
         <p className="lead subtitle">
           Discover insights across major airlines and unlock data-driven strategies.
         </p>
+
+        {/* Image Credit */}
+        <div className="image-credit">
+          Photo by{' '}
+          <a
+            href="https://unsplash.com/@dshap"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Daniel Shapiro
+          </a>{' '}
+          on{' '}
+          <a
+            href="https://unsplash.com/photos/a-large-jetliner-flying-through-a-gray-sky-tpdQ8_h5Mzg"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Unsplash
+          </a>
+        </div>
       </div>
 
       <hr className="homepage-divider" />
 
-      <h2 className="fw-bold analysis-title">
-        Analysis by Airline
-      </h2>
+      <h2 className="fw-bold analysis-title">Analysis by Airline</h2>
       <p className="analysis-subtitle">Click on an Airline to see in-depth analysis!</p>
 
       <Row className="justify-content-center airline-logos-row">
