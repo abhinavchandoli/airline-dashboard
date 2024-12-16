@@ -39,7 +39,6 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
     height: 400,
   };
 
-  // Volume chart
   const volumeBarData = stockChartData.map((item, index) => {
     const prevPrice = index > 0 ? stockChartData[index - 1].price : item.price;
     return { ...item, priceChange: item.price - prevPrice };
@@ -52,9 +51,13 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
     colorField: 'priceChange',
     scale: {
       color: ({ priceChange }) => {
-        if (priceChange > 0) return 'green';
-        if (priceChange < 0) return 'red';
-        return 'gray';
+        if (priceChange > 0) {
+          return 'green';
+        } else if (priceChange < 0) {
+          return 'red';
+        } else {
+          return 'gray';
+        }
       },
     },
     style: {
@@ -67,7 +70,6 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
     height: 200,
   };
 
-  // Seasonals chart
   const seasonalsChartConfig = {
     data: seasonalChartData,
     xField: 'month',
@@ -80,8 +82,12 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
       },
     },
     axis: {
-      x: { title: 'Month' },
-      y: { title: 'Price' },
+      x: {
+        title: 'Month',
+      },
+      y: {
+        title: 'Price',
+      },
     },
     colorField: 'year',
     shapeField: 'smooth',
@@ -114,7 +120,7 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
     },
   };
 
-  // Handler for the Segmented control
+  // Handler for view switch
   const handleViewChange = (value) => {
     setStockViewRange(value);
   };
@@ -126,8 +132,6 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
           {airlineInfo?.nasdaqName} ({airlineInfo?.ticker})
         </h2>
       </div>
-
-      {/* KPI Cards */}
       <div style={{ marginTop: '24px' }}>
         <Row gutter={[16, 16]} justify="start" align="top">
           <Col xs={24} sm={12} md={8} lg={6}>
@@ -208,34 +212,33 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
             </Card>
           </Col>
         </Row>
-
-        {/* Segmented Control */}
         <div style={{ marginTop: '24px' }}>
           <Segmented
-            options={['1Y', '3Y', '5Y', 'Max', 'Forecast']}
+            options={['1Y', '3Y', '5Y', 'Max', 'Forecast']} // Added 'Forecast' option
             value={stockViewRange}
             onChange={handleViewChange}
           />
         </div>
-
-        {/* Charts + Forecast */}
         <div style={{ marginTop: '24px' }}>
-          {/* Always show these charts */}
-          <Area {...stockPriceAreaConfig} />
-          <Column {...volumeBarChartConfig} />
-          <Card title="Seasonals" className="custom-card">
-            <Line {...seasonalsChartConfig} />
-          </Card>
-
-          {/* Only show the forecast image + disclaimer if stockViewRange === 'Forecast' */}
-          {stockViewRange === 'Forecast' && (
+          {stockViewRange !== 'Forecast' ? (
+            // Render charts for other options
+            <>
+              <Area {...stockPriceAreaConfig} />
+              <Column {...volumeBarChartConfig} />
+              <Card title="Seasonals" className="custom-card">
+                <Line {...seasonalsChartConfig} />
+              </Card>
+            </>
+          ) : (
+            // Render forecast image when 'Forecast' is selected
             forecastImagePath ? (
-              <div style={{ textAlign: 'center', marginTop: '24px' }}>
+              <div style={{ textAlign: 'center' }}>
                 <img
                   src={forecastImagePath}
                   alt={`${airlineInfo?.nasdaqName} Forecast`}
                   style={{ maxWidth: '100%', height: 'auto' }}
                 />
+                {/* Disclaimer Under Forecast Image */}
                 <div style={{ marginTop: '16px', textAlign: 'center' }}>
                   <InfoCircleOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
                   <span style={{ fontSize: '0.9rem', color: '#555' }}>
@@ -246,12 +249,10 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
                 </div>
               </div>
             ) : (
-              <p style={{ marginTop: '16px' }}>Forecast image not available.</p>
+              <p>Forecast image not available.</p>
             )
           )}
         </div>
-
-        {/* Peer Comparison */}
         <div style={{ marginTop: '28px' }}>
           <h4 style={{ marginBottom: '24px' }}>Peer Comparison</h4>
           <Row gutter={[16, 16]} justify="center" align="top">
