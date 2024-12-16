@@ -47,26 +47,26 @@ const HomePage = () => {
         <p className="lead subtitle">
           Discover insights across major airlines and unlock data-driven strategies.
         </p>
+      </div>
 
-        {/* Image Credit */}
-        <div className="image-credit">
-          Photo by{' '}
-          <a
-            href="https://unsplash.com/@dshap"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Daniel Shapiro
-          </a>{' '}
-          on{' '}
-          <a
-            href="https://unsplash.com/photos/a-large-jetliner-flying-through-a-gray-sky-tpdQ8_h5Mzg"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Unsplash
-          </a>
-        </div>
+      {/* Image Credit, placed outside .main-title-section, right below the background image */}
+      <div className="image-credit">
+        Photo by{' '}
+        <a
+          href="https://unsplash.com/@dshap"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Daniel Shapiro
+        </a>{' '}
+        on{' '}
+        <a
+          href="https://unsplash.com/photos/a-large-jetliner-flying-through-a-gray-sky-tpdQ8_h5Mzg"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Unsplash
+        </a>
       </div>
 
       <hr className="homepage-divider" />
