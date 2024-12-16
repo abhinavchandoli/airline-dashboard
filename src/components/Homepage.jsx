@@ -19,17 +19,24 @@ const airlines = [
 ];
 
 
-const AirlineLogo = ({ airline }) => (
-  <div className="airline-logo-container">
-    <Link to={`/airline/${airline.id}`}>
-      <img
-        src={airline.logo}
-        alt={airline.name}
-        className="img-fluid airline-logo"
-      />
-    </Link>
-  </div>
-);
+const AirlineLogo = ({ airline }) => {
+  return (
+    <div style={{ height: '80px', overflow: 'hidden' }}>
+      <Link to={`/airline/${airline.id}`}>
+        <img
+          src={airline.logo}
+          alt={airline.name}
+          className="img-fluid"
+          style={{
+            height: '100%',
+            width: '100%',
+            objectFit: 'contain',
+          }}
+        />
+      </Link>
+    </div>
+  );
+};
 
 const HomePage = () => {
   const [activeAirlineId, setActiveAirlineId] = useState(airlines[0].id);
@@ -84,7 +91,10 @@ const HomePage = () => {
           <a href="https://catsr.vse.gmu.edu/" target="_blank" rel="noopener noreferrer">
             Center for Air Transportation Systems Research (CATSR)
           </a>{' '}
-          at George Mason University, which was chartered in 2003, the dashboard provides valuable
+          at{' '}
+          <a href="https://www.gmu.edu/" target="_blank" rel="noopener noreferrer">
+            George Mason University
+          </a>{' '}, which was chartered in 2003, the dashboard provides valuable
           insights into airline performance metrics. It empowers users to explore data trends and
           derive meaningful conclusions about the industry's financial health.
         </Paragraph>
