@@ -8,9 +8,12 @@ const Header = () => {
       <Navbar
         expand="lg"
         variant="dark"
-        bg="dark"
+        style={{ 
+          backgroundColor: '#000000', 
+          padding: '1rem 2rem', 
+          borderRadius: '15px' 
+        }}
         className="rounded-3 shadow"
-        style={{ padding: '1rem 2rem', borderRadius: '15px' }}
       >
         <Container className="justify-content-between">
           <Navbar.Brand as={Link} to="/" className="fw-bold">
