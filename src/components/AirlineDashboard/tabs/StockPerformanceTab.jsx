@@ -1,8 +1,6 @@
-// src/components/AirlineDashboard/tabs/StockPerformanceTab.jsx
-
 import React, { useState, useMemo } from 'react';
 import { Row, Col, Card, Statistic, Segmented } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { ArrowUpOutlined, ArrowDownOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Area, Column, Line } from '@ant-design/plots';
 
 import { formatNumber } from '../../../utils/formatNumber';
@@ -29,7 +27,7 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
       x: {
         title: 'Date',
         labelSpacing: 6,
-        style: { labelTransform: 'rotate(90deg)' }, // Corrected to 'rotate(90deg)'
+        style: { labelTransform: 'rotate(90deg)' },
       },
       y: {
         title: 'Price',
@@ -240,6 +238,15 @@ const StockPerformanceTab = ({ airlineId, airlineInfo, stockData, allStockKPIs, 
                   alt={`${airlineInfo?.nasdaqName} Forecast`}
                   style={{ maxWidth: '100%', height: 'auto' }}
                 />
+                {/* Disclaimer Under Forecast Image */}
+                <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                  <InfoCircleOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
+                  <span style={{ fontSize: '0.9rem', color: '#555' }}>
+                    Disclaimer: Stock price predictions are for informational purposes only
+                    and should not be considered financial advice. Past performance does
+                    not guarantee future results.
+                  </span>
+                </div>
               </div>
             ) : (
               <p>Forecast image not available.</p>
