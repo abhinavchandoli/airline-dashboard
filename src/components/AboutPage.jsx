@@ -16,7 +16,7 @@ const teamMembers = [
   {
     name: 'Sai Krishna Nalla',
     role: 'Data Analysis, Backend Development, Machine Learning',
-    linkedin: 'www.linkedin.com/in/sai-krishna-nalla-361289190',
+    linkedin: 'https://www.linkedin.com/in/sai-krishna-nalla-361289190',
   },
   {
     name: 'Prudhviraj Sakile',
