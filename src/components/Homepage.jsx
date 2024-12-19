@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Typography } from 'antd';
+import { Analytics } from '@vercel/analytics/react';
 
 const { Title, Paragraph } = Typography;
 
@@ -131,6 +132,7 @@ const HomePage = () => {
           aim to support informed decision-making and contribute to the advancement of the aviation
           industry.
         </Paragraph>
+        <Analytics />
       </div>
     </Container>
   );
