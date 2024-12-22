@@ -37,6 +37,13 @@ const dataSources = [
     link: 'https://finance.yahoo.com/',
     collectionName: 'stock_data',
   },
+  {
+    title: 'Balance Sheets',
+    description:
+      'Quarterly and annual balance sheets reported by airlines.',
+    link: 'https://www.transtats.bts.gov/',
+    collectionName: 'balanceSheets',
+  },
 ];
 
 // Glossary Array (Ordered Alphabetically)
