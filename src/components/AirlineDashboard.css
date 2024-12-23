@@ -20,3 +20,25 @@
   margin: 0 auto; /* Center the container */
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
+
+@media (max-width: 768px) {
+  .custom-card {
+    padding: 8px !important;
+  }
+
+  /* Statistic titles in KPI cards */
+  .ant-statistic-title {
+    font-size: 0.85rem; 
+  }
+  .ant-statistic-content-value {
+    font-size: 1rem;
+  }
+
+  /* Possibly reduce table text size */
+  .ant-table-thead > tr > th {
+    font-size: 0.85rem;
+  }
+  .ant-table-tbody > tr > td {
+    font-size: 0.85rem;
+  }
+}
