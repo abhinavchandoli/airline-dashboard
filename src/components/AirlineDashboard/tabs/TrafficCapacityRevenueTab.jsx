@@ -4,7 +4,6 @@ import { Row, Col, Card, Table } from 'antd';
 import { GridContent } from '@ant-design/pro-layout';
 import { Column, Line } from '@ant-design/plots';
 
-import useIsMobile from '../../../hooks/useIsMobile';
 import RegionYearFilters from '../filters/RegionYearFilters';
 import KPIFilters from '../kpis/KPIFilters';
 import KPICards from '../kpis/KPICards';
@@ -28,8 +27,6 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
   const [kpiSelectedRegion, setKpiSelectedRegion] = useState('All');
   const [kpiSelectedYear, setKpiSelectedYear] = useState('All');
   const [chartSelectedRegion, setChartSelectedRegion] = useState('All');
-
-  const isMobile = useIsMobile();
 
   const kpis = useKPIs(airlineData, kpiSelectedRegion, kpiSelectedYear);
 
@@ -64,8 +61,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       radiusBottomLeft: 8,
       radiusBottomRight: 8,
     },
-    height: isMobile ? 220 : 400,
-    padding: isMobile ? [16, 16, 32, 40] : 'auto',
+    height:400,
     tooltip: {
       items: [{ channel: 'y', valueFormatter: formatNumber }],
     },
@@ -80,8 +76,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     data: loadFactorData,
     xField: 'YEAR',
     yField: 'value',
-    height: isMobile ? 220 : 400, // smaller on mobile
-    padding: isMobile ? 'auto' : 'auto',
+    height: 400,
     style: {
       stroke: '#2892d7',
       shape: 'smooth',
@@ -111,8 +106,8 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       shape: 'smooth',
       lineWidth: 2,
     },
-    height: isMobile ? 220 : 400, // smaller on mobile
-    padding: isMobile ? 'auto' : 'auto',
+    height: 400,
+    padding: 'auto',
     axis: {
       y: { title: '¢ per ASM' },
     },
@@ -124,8 +119,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     data: yieldData,
     xField: 'YEAR',
     yField: 'value',
-    height: isMobile ? 220 : 400, // smaller on mobile
-    padding: isMobile ? 'auto' : 'auto',
+    height: 400,
     style: {
       stroke: '#2892d7',
       shape: 'smooth',
@@ -148,7 +142,6 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     yField: 'value',
     colorField: 'QUARTER',
     seriesField: 'QUARTER',
-    height: isMobile ? 220 : 400,
     stack: {
       groupBy: ['x', 'series'],
       series: false,
@@ -177,6 +170,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       radiusBottomRight: 8,
     },
     tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    height: 400,
   };
 
   const rpmChartConfig = {
@@ -185,7 +179,6 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
     yField: 'value',
     colorField: 'QUARTER',
     seriesField: 'QUARTER',
-    height: isMobile ? 220 : 400,
     stack: {
       groupBy: ['x', 'series'],
       series: false,
@@ -214,6 +207,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       radiusBottomRight: 8,
     },
     tooltip: { items: [{ channel: 'y', valueFormatter: formatNumber }] },
+    height: 400,
   };
 
   const getLast5YearsData = (metric) => {
@@ -243,7 +237,6 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
       title: 'Year',
       dataIndex: 'YEAR',
       key: 'YEAR',
-      width: '50%',
     },
     {
       title: metric,
@@ -280,8 +273,8 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
 
       <GridContent>
         {/* Transport Revenue - Passengers */}
-        <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-          <Col xs={24} sm={24} md={24} lg={24}>
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
             <Card title="Transport Revenue - Passengers ($)" className="custom-card">
               <Column {...transRevPaxChartConfig} />
             </Card>
@@ -289,8 +282,8 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
         </Row>
 
         {/* Operating Revenue */}
-        <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-          <Col xs={24} sm={24} md={24} lg={24}>
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
             <Card title="Operating Revenue ($)" className="custom-card">
               <Column {...OpRevenueChartConfig} />
             </Card>
@@ -298,8 +291,8 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
         </Row>
 
         {/* ASM */}
-        <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-          <Col xs={24} md={12}>
+        <Row gutter={24} style={{ marginTop: '24px' }}>
+          <Col xs={24} lg={12}>
             <Card
               className="custom-card"
               title={
@@ -317,14 +310,14 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
           </Col>
           <Col xs={24} lg={12}>
             <Card title="ASM - Last 5 Years" className="custom-card">
-              <Table columns={tableColumns('ASM')} dataSource={getLast5YearsData('ASM')} pagination={false} size={isMobile ? 'small' : 'default'}/>
+              <Table columns={tableColumns('ASM')} dataSource={getLast5YearsData('ASM')} pagination={false} />
             </Card>
           </Col>
         </Row>
 
         {/* RPM */}
-        <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-          <Col xs={24} md={12}>
+        <Row gutter={24} style={{ marginTop: '24px' }}>
+          <Col xs={24} lg={12}>
             <Card
               className="custom-card"
               title={
@@ -342,7 +335,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
           </Col>
           <Col xs={24} lg={12}>
             <Card title="RPM - Last 5 Years" className="custom-card">
-              <Table columns={tableColumns('RPM')} dataSource={getLast5YearsData('RPM')} pagination={false} size={isMobile ? 'small' : 'default'}/>
+              <Table columns={tableColumns('RPM')} dataSource={getLast5YearsData('RPM')} pagination={false} />
             </Card>
           </Col>
         </Row>
@@ -356,7 +349,7 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
           </Col>
           <Col xs={24} lg={12}>
             <Card title="Load Factor - Last 5 Years" className="custom-card">
-              <Table columns={tableColumns('Load Factor (%)')} dataSource={getLast5YearsLoadFactorData()} pagination={false} size={isMobile ? 'small' : 'default'}/>
+              <Table columns={tableColumns('Load Factor (%)')} dataSource={getLast5YearsLoadFactorData()} pagination={false} />
             </Card>
           </Col>
         </Row>
@@ -379,14 +372,14 @@ const TrafficCapacityRevenueTab = ({ airlineData, handleEnlargeClick }) => {
           </Col>
           <Col xs={24} lg={12}>
             <Card title="Passenger Yield - Last 5 Years" className="custom-card">
-              <Table columns={tableColumns('Yield (¢ per mile)')} dataSource={getLast5YearsYieldData()} pagination={false} size={isMobile ? 'small' : 'default'}/>
+              <Table columns={tableColumns('Yield (¢ per mile)')} dataSource={getLast5YearsYieldData()} pagination={false} />
             </Card>
           </Col>
         </Row>
 
         {/* Operating Expenses */}
-        <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-          <Col xs={24} sm={24} md={24} lg={24}>
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
             <Card className="custom-card" title="Operating Expenses ($)">
               <Column {...opExpensesChartConfig} />
             </Card>
