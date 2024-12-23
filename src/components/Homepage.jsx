@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { Typography } from 'antd';
+import { Typography, Modal } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { isMobileDevice } from '../utils/isMobile'; // or wherever you place the function
 
 const { Title, Paragraph } = Typography;
 
@@ -18,6 +20,7 @@ const airlines = [
   { id: 'united-airlines', name: 'United Air Lines Inc.', logo: '/united-logo.png' },
 ];
 
+// Component for clickable airline logo
 const AirlineLogo = ({ airline }) => {
   return (
     <div style={{ height: '80px', overflow: 'hidden' }}>
@@ -39,9 +42,51 @@ const AirlineLogo = ({ airline }) => {
 
 const HomePage = () => {
   const [activeAirlineId, setActiveAirlineId] = useState(airlines[0].id);
+  const [showMobilePrompt, setShowMobilePrompt] = useState(false);
+
+  useEffect(() => {
+    // If user is on mobile, show the prompt
+    if (isMobileDevice()) {
+      setShowMobilePrompt(true);
+    }
+  }, []);
+
+  const handleClosePrompt = () => {
+    setShowMobilePrompt(false);
+  };
 
   return (
     <Container fluid className="homepage-container text-center">
+      {/* Ant Design Modal */}
+      <Modal
+        open={showMobilePrompt}
+        onCancel={handleClosePrompt}
+        footer={null}
+        centered
+        // You can tweak the width or styling further if needed
+      >
+        <div style={{ textAlign: 'center', padding: '16px' }}>
+          <InfoCircleOutlined style={{ fontSize: '2rem', color: '#1890ff' }} />
+          <Title level={4} style={{ marginTop: '16px' }}>
+            This website is best experienced on a Desktop Browser
+          </Title>
+          <Paragraph style={{ marginTop: '8px' }}>
+            or turn on <strong>“Desktop Site”</strong> option.
+            <br />
+            Mobile optimized site is coming soon!
+          </Paragraph>
+          <Paragraph style={{ marginTop: '8px', fontSize: '0.95rem' }}>
+            To enable Desktop Site:
+            <br />
+            <em>
+              Click the three-dot menu on your mobile browser, 
+              then check the “Desktop Site” option.
+            </em>
+          </Paragraph>
+        </div>
+      </Modal>
+
+      {/* Existing content */}
       <div className="main-title-section">
         <h1 className="display-3 fw-bold main-title">Airline Financial Economics</h1>
         <p className="lead subtitle">
@@ -49,7 +94,6 @@ const HomePage = () => {
         </p>
       </div>
 
-      {/* Image Credit, placed outside .main-title-section, right below the background image */}
       <div className="image-credit">
         Photo by{' '}
         <a
@@ -91,7 +135,8 @@ const HomePage = () => {
       </Row>
 
       <div className="welcome-section">
-        <Title level={2}>          Welcome to Airline Financial Economics Dashboard
+        <Title level={2}>
+          Welcome to Airline Financial Economics Dashboard
         </Title>
         <Paragraph style={{ fontSize: '1.1rem', lineHeight: '1.8' }}>
           The U.S. airline industry is a vital component of the nation's economy, connecting people
