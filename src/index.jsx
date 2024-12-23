@@ -26,31 +26,6 @@ root.render(
   </React.StrictMode>
 );
 
-const fitDashboardToScreen = () => {
-  const screenWidth = window.innerWidth; // Device screen width
-  const screenHeight = window.innerHeight; // Device screen height
-  const baseWidth = 1280; // Fixed dashboard width for desktop mode
-  const baseHeight = 720; // Approximate height for desktop mode (adjust as needed)
-  
-  // Calculate scale factors for width and height
-  const widthScaleFactor = screenWidth / baseWidth;
-  const heightScaleFactor = screenHeight / baseHeight;
 
-  // Use the smaller scale factor to ensure the content fits entirely
-  const scaleFactor = Math.min(widthScaleFactor, heightScaleFactor);
-
-  // Update the viewport meta tag dynamically
-  const metaViewport = document.querySelector('meta[name="viewport"]');
-  if (metaViewport) {
-      metaViewport.setAttribute(
-          'content',
-          `width=${baseWidth}, initial-scale=${scaleFactor}, maximum-scale=${scaleFactor}, user-scalable=no`
-      );
-  }
-};
-
-// Apply scaling on page load and resize
-window.addEventListener('resize', fitDashboardToScreen);
-window.addEventListener('load', fitDashboardToScreen);
 
 
