@@ -26,7 +26,7 @@ const teamMembers = [
   {
     name: 'Pranay Reddy Ala',
     role: 'Product Owner, Client Communication',
-    linkedin: 'https://www.linkedin.com/in/david-brown',
+    linkedin: 'https://www.linkedin.com/in/pranay-reddy-ala-13443116a/',
   },
   {
     name: 'Kiran Kumar Reddy Yerrabathini',
